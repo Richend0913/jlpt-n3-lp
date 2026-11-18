@@ -1,0 +1,205 @@
+{
+ "_note": "SAMPLE DATA — NOT the production word list. 20 N3-level words written for development/testing only (fallback used by tools/build-data.js when data/words-*.json is absent). Same fields as data/schema.md, but 5 words per unit (not 20) so the Unit 3+ paywall is reachable. These words have NOT been through the SPEC.md data QA.",
+ "words": [
+  {
+   "id": "sample-001",
+   "word": "曖昧",
+   "reading": "あいまい",
+   "pos": "na-adjective",
+   "meaning": "vague, ambiguous",
+   "example": "曖昧な返事をしないでください。",
+   "example_translation": "Please don't give me a vague answer.",
+   "unit": 1
+  },
+  {
+   "id": "sample-002",
+   "word": "経験",
+   "reading": "けいけん",
+   "pos": "noun",
+   "meaning": "experience",
+   "example": "海外で働いた経験があります。",
+   "example_translation": "I have experience working abroad.",
+   "unit": 1
+  },
+  {
+   "id": "sample-003",
+   "word": "準備",
+   "reading": "じゅんび",
+   "pos": "noun",
+   "meaning": "preparation, getting ready",
+   "example": "旅行の準備はもう終わりましたか。",
+   "example_translation": "Have you finished getting ready for the trip?",
+   "unit": 1
+  },
+  {
+   "id": "sample-004",
+   "word": "必要",
+   "reading": "ひつよう",
+   "pos": "na-adjective",
+   "meaning": "necessary, needed",
+   "example": "この仕事には日本語が必要です。",
+   "example_translation": "Japanese is necessary for this job.",
+   "unit": 1
+  },
+  {
+   "id": "sample-005",
+   "word": "確認",
+   "reading": "かくにん",
+   "pos": "noun",
+   "meaning": "confirmation, check",
+   "example": "出かける前に、窓が閉まっているか確認してください。",
+   "example_translation": "Before you go out, please check that the windows are closed.",
+   "unit": 1
+  },
+  {
+   "id": "sample-006",
+   "word": "習慣",
+   "reading": "しゅうかん",
+   "pos": "noun",
+   "meaning": "habit, custom",
+   "example": "毎朝走るのが私の習慣です。",
+   "example_translation": "Running every morning is my habit.",
+   "unit": 2
+  },
+  {
+   "id": "sample-007",
+   "word": "普段",
+   "reading": "ふだん",
+   "pos": "adverb",
+   "meaning": "usually, ordinarily",
+   "example": "普段は電車で会社に行きます。",
+   "example_translation": "I usually go to the office by train.",
+   "unit": 2
+  },
+  {
+   "id": "sample-008",
+   "word": "届く",
+   "reading": "とどく",
+   "pos": "verb",
+   "meaning": "to arrive, to reach",
+   "example": "昨日注文した本は、今日届く予定です。",
+   "example_translation": "The book I ordered yesterday is supposed to arrive today.",
+   "unit": 2
+  },
+  {
+   "id": "sample-009",
+   "word": "様子",
+   "reading": "ようす",
+   "pos": "noun",
+   "meaning": "state, condition, appearance",
+   "example": "母は少し疲れた様子だった。",
+   "example_translation": "My mother looked a little tired.",
+   "unit": 2
+  },
+  {
+   "id": "sample-010",
+   "word": "意外",
+   "reading": "いがい",
+   "pos": "na-adjective",
+   "meaning": "unexpected, surprising",
+   "example": "テストは意外に簡単だった。",
+   "example_translation": "The test was surprisingly easy.",
+   "unit": 2
+  },
+  {
+   "id": "sample-011",
+   "word": "失敗",
+   "reading": "しっぱい",
+   "pos": "noun",
+   "meaning": "failure, mistake",
+   "example": "失敗を恐れないでください。",
+   "example_translation": "Please don't be afraid of failure.",
+   "unit": 3
+  },
+  {
+   "id": "sample-012",
+   "word": "決める",
+   "reading": "きめる",
+   "pos": "verb",
+   "meaning": "to decide",
+   "example": "自分のことは自分で決めるべきだ。",
+   "example_translation": "You should decide things about yourself on your own.",
+   "unit": 3
+  },
+  {
+   "id": "sample-013",
+   "word": "将来",
+   "reading": "しょうらい",
+   "pos": "noun",
+   "meaning": "future",
+   "example": "将来は医者になりたいです。",
+   "example_translation": "I want to become a doctor in the future.",
+   "unit": 3
+  },
+  {
+   "id": "sample-014",
+   "word": "留守",
+   "reading": "るす",
+   "pos": "noun",
+   "meaning": "being away from home",
+   "example": "父は今、留守にしています。",
+   "example_translation": "My father is away from home right now.",
+   "unit": 3
+  },
+  {
+   "id": "sample-015",
+   "word": "慌てる",
+   "reading": "あわてる",
+   "pos": "verb",
+   "meaning": "to panic, to be flustered",
+   "example": "時間はまだあるから、慌てる必要はない。",
+   "example_translation": "There's still time, so there's no need to panic.",
+   "unit": 3
+  },
+  {
+   "id": "sample-016",
+   "word": "違い",
+   "reading": "ちがい",
+   "pos": "noun",
+   "meaning": "difference",
+   "example": "二つの言葉の違いを説明してください。",
+   "example_translation": "Please explain the difference between the two words.",
+   "unit": 4
+  },
+  {
+   "id": "sample-017",
+   "word": "我慢",
+   "reading": "がまん",
+   "pos": "noun",
+   "meaning": "patience, putting up with",
+   "example": "痛くても、もう少し我慢してください。",
+   "example_translation": "Even if it hurts, please bear with it a little longer.",
+   "unit": 4
+  },
+  {
+   "id": "sample-018",
+   "word": "偶然",
+   "reading": "ぐうぜん",
+   "pos": "adverb",
+   "meaning": "by chance, coincidence",
+   "example": "駅で偶然、昔の友達に会った。",
+   "example_translation": "I ran into an old friend at the station by chance.",
+   "unit": 4
+  },
+  {
+   "id": "sample-019",
+   "word": "預ける",
+   "reading": "あずける",
+   "pos": "verb",
+   "meaning": "to leave in someone's care, to deposit",
+   "example": "荷物をホテルに預けることができますか。",
+   "example_translation": "Can I leave my luggage at the hotel?",
+   "unit": 4
+  },
+  {
+   "id": "sample-020",
+   "word": "苦手",
+   "reading": "にがて",
+   "pos": "na-adjective",
+   "meaning": "weak at, not good at",
+   "example": "私は数学が苦手です。",
+   "example_translation": "I'm not good at math.",
+   "unit": 4
+  }
+ ]
+}

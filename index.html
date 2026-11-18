@@ -36,6 +36,9 @@
   textarea.txt { min-height:76px; resize:vertical; }
   .submit { width:100%; background:#ff7a1a; color:#fff; font-weight:800; font-size:17px; border:none; padding:15px; border-radius:10px; cursor:pointer; }
   .done-panel { display:none; background:#0f2e17; border:1px solid #2c6e3f; border-radius:12px; padding:22px; text-align:center; margin-top:18px; }
+  .trybox { margin-top:22px; background:#101f3a; border:1px solid #ff7a1a; border-radius:14px; padding:20px; text-align:center; }
+  .trybtn { display:inline-block; background:#ff7a1a; color:#fff; font-weight:800; font-size:18px; text-decoration:none; padding:15px 34px; border-radius:10px; }
+  .trybox p { margin-top:10px; font-size:13.5px; color:#9fb2cc; }
   footer { padding:24px 0 40px; font-size:12px; color:#7e90ad; border-top:1px solid #1b2a47; }
   @media (max-width:680px){ h1{font-size:28px} .pains{grid-template-columns:1fr} }
 </style>
@@ -46,6 +49,11 @@
 
   <h1>JLPT N3 words,<br>checked by a <span class="accent">native speaker</span>.<br>Every single one.</h1>
   <p class="lead">Most JLPT apps now generate their questions, example sentences and audio with AI — and learners keep finding the mistakes. This is a small N3-only vocabulary app where a native Japanese speaker checks every word, reading, example sentence and recording before it ships.</p>
+
+  <div class="trybox">
+    <a class="trybtn" href="./app/">Try the free web version</a>
+    <p>1,000 N3 words with audio, quizzes and spaced repetition — right in your browser, no install. The first units are free.</p>
+  </div>
 
   <section>
     <h2>What learners <span class="accent">keep complaining about</span></h2>
@@ -75,7 +83,7 @@
   <section>
     <h2>The honest part</h2>
     <div class="honest">
-      <p><b>This app is not built yet.</b> It gets built only if enough N3 learners actually want it. Join the waitlist below — if registrations don't reach the threshold, it won't be made, and nobody is charged anything. Waitlist members get launch pricing locked in.</p>
+      <p><b>The web version is live.</b> You can study right now, free, in your browser — the full app-store release with the complete premium deck comes next. Join the waitlist below to get the launch notice and launch pricing locked in. Nobody is charged anything for joining.</p>
     </div>
 
     <form id="entry" action="https://formsubmit.co/info@mimoria.jp" method="POST">
@@ -111,12 +119,12 @@
     </form>
     <div class="done-panel" id="done">
       <b style="font-size:18px;">You're on the list.</b>
-      <p style="margin-top:8px;">Thanks for registering. If the app gets built, you'll be the first to know — with launch pricing locked in.</p>
+      <p style="margin-top:8px;">Thanks for registering. You'll be the first to know when the full version launches — with launch pricing locked in. In the meantime, the free web version above is ready to use.</p>
     </div>
   </section>
 
   <footer>
-    This page is a waitlist for an app under consideration. It has not been built yet, and no payment is taken. Your email is used only for the launch notice.
+    The free web version of this app is available now at the link above. This waitlist is for the full app-store launch; no payment is taken. Your email is used only for the launch notice.
   </footer>
 </div>
 <script>
