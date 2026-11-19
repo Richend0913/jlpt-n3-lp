@@ -192,6 +192,9 @@ ${w ? `<div class="entry">
 </div>`;
   }
 
+  // Shown outside the paywall (Settings row, locked dividers); the plan cards carry the full prices.
+  const PRICE_MO = '$12.99/mo', PRICE_YR = '$59.99/yr';
+
   // ---------- Learn: two tracks ----------
   function vocabToc() {
     const out = [];
@@ -202,7 +205,7 @@ ${w ? `<div class="entry">
       if (!open && !lockedShown) {
         lockedShown = true;
         const last = N3.UNITS[N3.UNITS.length - 1];
-        out.push(`</div><button class="prem" data-go="#/paywall?unit=${u}">Units ${range(u, last)} · Premium</button><div class="toc" style="margin-top:0">`);
+        out.push(`</div><button class="prem" data-go="#/paywall?unit=${u}">Units ${range(u, last)} · Premium · ${PRICE_MO}</button><div class="toc" style="margin-top:0">`);
       }
       const seen = ws.filter(w => N3.isSeen(w.id)).length;
       const done = open && seen === ws.length && ws.length > 0;
@@ -220,7 +223,7 @@ ${w ? `<div class="entry">
       const open = N3.isGUnitOpen(u);
       if (!open && !lockedShown) {
         lockedShown = true;
-        out.push(`</div><button class="prem" data-go="#/paywall?gunit=${u}">Units ${range(u, N3.G_UNITS[N3.G_UNITS.length - 1])} · Premium</button><div class="toc" style="margin-top:0">`);
+        out.push(`</div><button class="prem" data-go="#/paywall?gunit=${u}">Units ${range(u, N3.G_UNITS[N3.G_UNITS.length - 1])} · Premium · ${PRICE_MO}</button><div class="toc" style="margin-top:0">`);
       }
       const seen = gs.filter(g => N3.isSeen(g.id)).length;
       const done = open && seen === gs.length;
@@ -567,7 +570,7 @@ ${planNext(`<div class="btns"><button class="btn" data-act="${againAct}">Try aga
       let locked = false;
       for (const x of N3.LISTENING) {
         const o = N3.isListenOpen(x);
-        if (!o && !locked) { locked = true; rows.push(`</div><button class="prem" data-go="#/paywall?listen=1">Conversations ${range(x.no, N3.LISTENING.length)} · Premium</button><div class="toc" style="margin-top:0">`); }
+        if (!o && !locked) { locked = true; rows.push(`</div><button class="prem" data-go="#/paywall?listen=1">Conversations ${range(x.no, N3.LISTENING.length)} · Premium · ${PRICE_MO}</button><div class="toc" style="margin-top:0">`); }
         const e = st[x.id];
         rows.push(`<button class="tr${o ? '' : ' dim'}" data-act="listenOne" data-arg="${x.id}"><span class="n">${two(x.no)}</span><span class="nm">${x.type === 'response' ? 'Best reply' : 'Comprehension'}</span>${e && e.ok ? '<span class="stamp sm" lang="ja" aria-label="Answered correctly">済</span>' : ''}<span class="dots"></span><span class="rg">${e ? (e.ok ? 'correct' : 'missed') : x.script.length + ' lines'}</span></button>`);
       }
@@ -618,7 +621,7 @@ ${answered ? `${feedbackHtml(q)}<div class="btns"><button class="btn primary" da
     let locked = false;
     for (const p of N3.READING) {
       const o = N3.isReadOpen(p);
-      if (!o && !locked) { locked = true; rows.push(`</div><button class="prem" data-go="#/paywall?read=1">Passages ${range(p.no, N3.READING.length)} · Premium</button><div class="toc" style="margin-top:0">`); }
+      if (!o && !locked) { locked = true; rows.push(`</div><button class="prem" data-go="#/paywall?read=1">Passages ${range(p.no, N3.READING.length)} · Premium · ${PRICE_MO}</button><div class="toc" style="margin-top:0">`); }
       const e = st[p.id];
       rows.push(`<button class="tr${o ? '' : ' dim'}" data-act="readOne" data-arg="${p.id}"><span class="n">${two(p.no)}</span><span class="nm">${esc(p.title || 'Passage')}</span>${e ? '<span class="stamp sm" lang="ja" aria-label="Read">済</span>' : ''}<span class="dots"></span><span class="rg">${e ? `${e.r}/${e.t}` : `${p.chars}字`}</span></button>`);
     }
@@ -817,7 +820,7 @@ ${accountSec()}
   <div class="kv"><span>Grammar patterns</span><b>${N3.GRAMMAR.length} · ${plural(N3.G_UNITS.length, 'unit')}</b></div>
   <div class="kv"><span>Listening · reading</span><b>${N3.LISTENING.length} · ${N3.READING.length}</b></div>
   <div class="kv"><span>Free</span><b class="t">${unitRangeText()}, grammar units 1–${N3.FREE_G_UNITS}, ${N3.FREE_LISTENING} conversations, ${N3.FREE_READING} passages</b></div>
-  <div class="kv"><span>Premium</span><b class="t" data-go="#/paywall">${S().premium ? 'Active' : 'See plans'}</b></div>
+  <div class="kv"><span>Premium</span><b class="t" data-go="#/paywall">${S().premium ? 'Active' : `See plans<small class="kv-sub">${PRICE_MO} · ${PRICE_YR}</small>`}</b></div>
   <div class="kv"><span>Voice</span><b class="t" lang="ja">VOICEVOX:春日部つむぎ</b></div>
 </div></div>
 <div class="sec"><button class="danger" data-act="reset">Reset all progress</button></div>
