@@ -4,7 +4,7 @@
 (function () {
   'use strict';
   const N3 = window.N3;
-  const ACCT_KEY = 'n3tango.account.v1';   // {token, exp, id, email}
+  const ACCT_KEY = 'n3tango.account.v1';   // {token, exp, id, email, plan}
   const SYNC_KEY = 'n3tango.sync.v1';      // {owner, syncedAt}
   const DEBOUNCE_MS = 1500;
   const TIMEOUT_MS = 15000;
@@ -12,11 +12,18 @@
   // API base: dev override in localStorage ('n3tango.api'), local worker when served from 127.0.0.1 /
   // localhost (wrangler dev), otherwise the production Worker.
   const PROD_API = 'https://jlpt-account.burningbros.workers.dev';
+  // Stripe Payment Links (filled in once Stripe is connected; empty = checkout not open yet).
+  // Each link carries metadata plan=monthly|yearly; success URL .../app/#/settings?checkout=success
+  const PAY_LINKS = { monthly: '', yearly: '' };
+  N3.PAY_LINKS = PAY_LINKS;
   function apiBase() {
     let o = null;
     try { o = localStorage.getItem('n3tango.api'); } catch (e) {}
     if (o) return o.replace(/\/+$/, '');
-    return /^(127\.0\.0\.1|localhost)$/.test(location.hostname) ? 'http://127.0.0.1:8787' : PROD_API;
+    // Dev Worker only for the plain-http local dev server. Capacitor store builds are served from
+    // capacitor://localhost (iOS) / https://localhost (Android) and must use the production Worker.
+    const dev = location.protocol === 'http:' && /^(127\.0\.0\.1|localhost)$/.test(location.hostname);
+    return dev ? 'http://127.0.0.1:8787' : PROD_API;
   }
 
   const readJson = k => { try { const v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' ? v : null; } catch (e) { return null; } };
@@ -103,9 +110,28 @@
     }
   }
 
+  // The server owns Premium: apply its entitlement to the local mirror.
+  function applyEntitlement(ent) {
+    if (!ent || typeof ent !== 'object') return;
+    const plan = ent.active && (ent.plan === 'monthly' || ent.plan === 'yearly') ? ent.plan : null;
+    if (acct && acct.plan !== plan) { acct.plan = plan; writeJson(ACCT_KEY, acct); }
+    if (N3.setPremium(!!ent.active) && typeof N3.onEntitlement === 'function') { try { N3.onEntitlement(!!ent.active); } catch (e) {} }
+  }
+
+  // Session token payload 'sub' = the account's internal id (used as Stripe client_reference_id).
+  function userId() {
+    if (!signedIn()) return '';
+    try {
+      const p = acct.token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      const sub = JSON.parse(atob(p + '==='.slice((p.length + 3) % 4))).sub;
+      return typeof sub === 'string' ? sub : '';
+    } catch (e) { return ''; }
+  }
+
   // GET the cloud copy and reconcile with this device.
   async function pull(forceAdopt) {
     const remote = await api('GET', '/progress', undefined, true);
+    applyEntitlement(remote && remote.entitlement);
     const has = remote && remote.progress && typeof remote.updatedAt === 'number';
     if (!has) { await push(); return; }
     if (forceAdopt) { adopt(remote); return; }
@@ -189,6 +215,8 @@
     apiBase,
     signedIn,
     email: () => (acct && acct.email) || '',
+    userId,
+    plan: () => (acct && acct.plan) || null,
     status: () => (signedIn() ? status : acct && acct.email ? 'expired' : 'off'),
     statusText: s => STATUS_TEXT[s || N3.sync.status()] || '',
     errorText,
@@ -198,6 +226,7 @@
       clearTimeout(timer);
       acct = null;
       writeJson(ACCT_KEY, null);
+      N3.setPremium(false);   // Premium belongs to the account, not to the device
       setStatus('off');
     },
     syncNow: () => run(() => pull(false)),

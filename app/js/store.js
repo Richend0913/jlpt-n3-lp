@@ -26,7 +26,7 @@
         read: {},         // reading id -> {r: correct (last attempt), t: questions, n: attempts}
         sec: { lk: '', rd: '', ls: '' },  // recent answers per scoring section, '1' right / '0' wrong, newest last
       },
-      premium: false,     // no real purchase is wired up yet
+      premium: false,     // mirror of the account's server-side entitlement (sync.js applies it after each pull)
       updatedAt: 0,       // ms timestamp of the last local change (cloud sync: newer copy wins)
     };
   }
@@ -139,8 +139,18 @@
   };
 
   N3.resetAll = () => {
+    const premium = N3.state.premium;   // resetting progress does not cancel a subscription
     N3.state = defaults();
+    N3.state.premium = premium;
     N3.save();
+  };
+
+  // Server entitlement -> local mirror. Not a progress change: no updatedAt bump, no sync push.
+  N3.setPremium = active => {
+    if (N3.state.premium === !!active) return false;
+    N3.state.premium = !!active;
+    write();
+    return true;
   };
 
   N3.day = (k = N3.today()) => (N3.state.days[k] = N3.state.days[k] || { newCount: 0, reviewCount: 0, gNew: 0, gReview: 0, answers: 0, steps: [] });

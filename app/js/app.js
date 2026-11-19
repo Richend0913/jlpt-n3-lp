@@ -12,7 +12,7 @@
   const $nav = document.getElementById('nav');
 
   // In-memory UI state (runs are not persisted; answers and SRS results are saved as they happen).
-  const ui = { session: null, quiz: null, quizMode: 'mixed', listen: null, read: null, mock: null, plan: 'year', planRun: false, furi: true };
+  const ui = { session: null, quiz: null, quizMode: 'mixed', listen: null, read: null, mock: null, plan: 'year', planRun: false, furi: true, apRun: null };
 
   // ---------- helpers ----------
   let toastTimer;
@@ -113,6 +113,34 @@
     if (!s) { ui.planRun = false; return `<p class="lede">Today's plan is done: ${plural(p.steps.length, 'step')}.</p><div class="btns"><button class="btn primary" data-act="home">Back to Home</button></div>`; }
     return `<div class="btns" style="flex-direction:column"><button class="btn primary" data-act="planStart">Next: ${esc(s.title)} · about ${s.min} min</button><button class="btn" data-act="home">Back to Home</button></div>`;
   }
+  // ---------- Early account prompt (guests only) ----------
+  // Progress of a guest lives only in this browser's storage (it is uploaded on first signup), so after the
+  // first finished session we suggest a free account once, and Home shows a slim reminder until sign-in.
+  // Flags live in their own key, not in N3.state, so showing the prompt never bumps updatedAt.
+  const AP_KEY = 'n3tango.acctPrompt.v1';   // {shown: bool, account: bool}
+  let ap = (() => { try { const v = JSON.parse(localStorage.getItem(AP_KEY)); return v && typeof v === 'object' ? v : {}; } catch (e) { return {}; } })();
+  const apSave = () => { try { localStorage.setItem(AP_KEY, JSON.stringify(ap)); } catch (e) {} };
+  // True once this device has been signed in (also covers an expired session and a later logout).
+  function hasAccount() {
+    if (ap.account) return true;
+    if (N3.sync.signedIn() || N3.sync.email()) { ap.account = true; apSave(); return true; }
+    return false;
+  }
+  // End-screen card. Shown on the first finished run only; it stays on that run's screen until dismissed.
+  function acctPrompt(run) {
+    if (hasAccount()) return '';
+    if (ui.apRun !== run) {
+      if (ap.shown) return '';
+      ui.apRun = run; ap.shown = true; apSave();
+    }
+    return `<div class="ap" id="acct-prompt" role="region" aria-labelledby="ap-h">
+  <div class="h" id="ap-h">Keep your progress safe</div>
+  <p>Your progress is saved only on this device. Create a free account and it follows you when you change phones.</p>
+  <div class="btns"><button class="btn" data-act="apLater">Later</button><button class="btn primary" data-act="apCreate">Create free account</button></div>
+</div>`;
+  }
+  const acctBanner = () => (hasAccount() ? '' : `<p class="ap-bar" id="acct-banner">Your progress is saved only on this device. <button class="txtbtn" data-act="accountFirst">Create a free account</button></p>`);
+
   function startStep(key) {
     if (key === 'vocab') return startSession('vocab', 'today');
     if (key === 'grammar') return startSession('grammar', 'today');
@@ -145,6 +173,7 @@
     return `
 <div class="hd"><div class="logo">N3 <span>Tango</span></div><div class="right">${gearBtn()}</div></div>
 ${dateLine()}
+${acctBanner()}
 <div class="sec">${secHead('Today')}
   ${today}
   <p class="rev">Reviews due: <span class="ind">${revParts.length ? esc(revParts.join(' · ')) : 'none'}</span></p>
@@ -297,6 +326,7 @@ ${N3.META.source === 'sample' ? '<p class="fine">Sample word list (development b
       return `
 ${hd('Session complete')}
 <div class="score"><span class="big">${s.firstKnow}<small> / ${s.total}</small></span><span class="lbl">known on the first look · ${esc(s.title)}</span></div>
+${acctPrompt(s)}
 <div class="kvs">
   <div class="kv"><span>${G ? 'Grammar reviews due now' : 'Word reviews due now'}</span><b>${G ? N3.dueGrammar().length : N3.dueWords().length}</b></div>
   <div class="kv"><span>${G ? 'New patterns today' : 'New words today'}</span><b>${G ? `${d.gNew} / ${S().settings.dailyGrammar}` : `${d.newCount} / ${S().settings.dailyNew}`}</b></div>
@@ -512,6 +542,7 @@ ${tail}`;
     return `
 ${hd(title)}
 <div class="score"><span class="big">${right}<small> / ${n}</small></span><span class="lbl">correct</span></div>
+${acctPrompt(z)}
 <p class="lede">${wrongLk ? `${plural(wrongLk, 'missed item')} ${wrongLk === 1 ? 'is' : 'are'} back in today's reviews.` : right === n ? `All ${n} correct.` : ''}</p>
 <div class="rlist">${z.questions.map(reviewRow).join('')}</div>
 ${planNext(`<div class="btns"><button class="btn" data-act="${againAct}">Try again</button><button class="btn primary" data-act="leaveResults" data-arg="${doneHref}">Done</button></div>`)}`;
@@ -553,6 +584,7 @@ ${hd('Listening', { back: true, right: '<span lang="ja">聴解</span>' })}
       return `
 ${hd('Listening results')}
 <div class="score"><span class="big">${right}<small> / ${z.questions.length}</small></span><span class="lbl">correct</span></div>
+${acctPrompt(z)}
 <div class="rlist">${z.questions.map(reviewRow).join('')}</div>
 ${planNext(`<div class="btns"><button class="btn" data-act="listenRound">Next ${plural(Math.min(5, N3.openListening().length), 'conversation')}</button><button class="btn primary" data-act="leaveListen">Done</button></div>`)}`;
     }
@@ -607,6 +639,7 @@ ${hd(`Passage ${r.p.no}`, { back: true, right: `<button class="txtbtn" data-act=
 ${passageHtml(r.p)}
 ${r.qs.map((q, qi) => `<div class="rq"><div class="qn">Question ${qi + 1} of ${r.qs.length}</div><div class="qtext">${esc(q.q.q)}</div>${choicesHtml(q, { reveal: true, prefix: qi + ':' })}</div>`).join('')}
 ${done ? `<div class="fb ${right === r.qs.length ? 'ok' : 'ng'}"><div class="h">${right} of ${r.qs.length} correct</div></div>
+${acctPrompt(r)}
 ${planNext(`<div class="btns"><button class="btn" data-go="#/reading">All passages</button>${N3.nextReading() && N3.nextReading().id !== r.p.id ? `<button class="btn primary" data-act="readOne" data-arg="${N3.nextReading().id}">Next passage</button>` : ''}</div>`)}` : ''}`;
   }
   function pickRead(arg) {
@@ -689,6 +722,7 @@ ${choicesHtml(q, { reveal: false })}
 ${hd('Mock test results')}
 <div class="score"><span class="big">${j.total}<small> / 180</small></span><span class="lbl">pass line 95</span></div>
 ${verdict}
+${acctPrompt(m)}
 <div class="secs">
 ${N3.SEC_KEYS.map(k => { const sc = j.scores[k]; const [r, t] = m.secs[k]; return `<div class="secr" data-sec="${k}"><div class="top"><span class="nm">${esc(N3.SECTIONS[k].name)}<small lang="ja">${esc(N3.SECTIONS[k].jp)}</small></span><span class="sc">${sc}<small> / 60</small></span></div>
   ${meter(sc, 60, N3.SEC_CUTOFF)}
@@ -893,12 +927,42 @@ ${accountSec()}
   <div>${I('check')}Mock tests drawn from everything</div>
   <div>${I('check')}Works offline</div>
 </div>
-<div class="plans">
-  <button class="plan-o${yr ? ' on' : ''}" data-act="plan" data-arg="year"><span class="rad"></span><span class="t">Yearly<small>$5.00 a month, billed yearly · 61% less</small></span><span class="pr">$59.99<small>per year</small></span></button>
-  <button class="plan-o${yr ? '' : ' on'}" data-act="plan" data-arg="month"><span class="rad"></span><span class="t">Monthly<small>Billed monthly</small></span><span class="pr">$12.99<small>per month</small></span></button>
-</div>
-<button class="btn primary start" data-act="buy">Coming soon</button>
-<p class="fine">Purchases are not available in this preview build. Nothing will be charged.</p>`;
+${paywallPlans(yr)}`;
+  }
+
+  const PLAN_NAME = { monthly: 'Monthly', yearly: 'Yearly' };
+  // Stripe Payment Link for a plan, tagged with the account id (client_reference_id) and email.
+  function checkoutUrl(plan) {
+    const base = (N3.PAY_LINKS && N3.PAY_LINKS[plan]) || '';
+    const uid = N3.sync.userId();
+    if (!base || !uid) return '';
+    return base + (base.includes('?') ? '&' : '?') + 'client_reference_id=' + encodeURIComponent(uid) +
+      '&prefilled_email=' + encodeURIComponent(N3.sync.email());
+  }
+  function paywallPlans(yr) {
+    if (S().premium) {
+      const p = N3.sync.plan();
+      return `<div class="pw-on" id="pw-active"><b>Premium is active</b>${p ? `<span>${PLAN_NAME[p]} plan</span>` : ''}</div>
+<p class="fine">Every unit, conversation and passage is open on this account.</p>`;
+    }
+    const cards = `<div class="plans">
+  <button class="plan-o${yr ? ' on' : ''}" data-act="plan" data-arg="year" data-plan="yearly"><span class="rad"></span><span class="t">Yearly <span class="save">SAVE 61%</span><small>$5.00 a month, billed yearly</small></span><span class="pr">$59.99<small>per year</small></span></button>
+  <button class="plan-o${yr ? '' : ' on'}" data-act="plan" data-arg="month" data-plan="monthly"><span class="rad"></span><span class="t">Monthly<small>Billed monthly</small></span><span class="pr">$12.99<small>per month</small></span></button>
+</div>`;
+    const plan = yr ? 'yearly' : 'monthly';
+    if (!N3.sync.signedIn()) {
+      return `${cards}
+<button class="btn primary start" data-act="accountFirst" id="pw-account">Create a free account first</button>
+<p class="fine">Premium attaches to your account, so it works on every device you sign in on.</p>`;
+    }
+    const url = checkoutUrl(plan);
+    if (!url) {
+      return `${cards}
+<p class="note pw-soon" id="pw-soon">Online checkout opens shortly.</p>`;
+    }
+    return `${cards}
+<a class="btn primary start" id="pw-buy" href="${esc(url)}" rel="noopener">Continue — ${PLAN_NAME[plan]}, ${yr ? '$59.99 a year' : '$12.99 a month'}</a>
+<p class="fine">Secure payment by Stripe. The subscription renews automatically until you cancel it.</p>`;
   }
 
   // ---------- Router ----------
@@ -940,6 +1004,14 @@ ${accountSec()}
     sheetCtl = null;
     const zone = $view.querySelector('.zone[data-sheet="session"]');
     if (zone) sheetCtl = N3.mountSheet(zone, () => { if (ui.session && !ui.session.revealed) { ui.session.revealed = true; render(); } });
+    // "Create a free account" (paywall, account prompt, Home banner): bring the account form into view.
+    if (ui.focusAcct && name === 'settings') {
+      ui.focusAcct = false;
+      const el = document.getElementById('account');
+      if (el) el.scrollIntoView({ block: 'start' });
+      const f = document.getElementById('acct-email');
+      if (f) f.focus({ preventScroll: true });
+    }
   }
 
   // ---------- Actions ----------
@@ -1124,10 +1196,17 @@ ${accountSec()}
     importProgress() { const f = document.getElementById('import-file'); if (f) { f.value = ''; f.click(); } },
 
     plan(arg) { ui.plan = arg; render(); },
-    buy() { toast('Purchases are not available yet.'); },
+    apLater() { ui.apRun = null; render(); },
+    apCreate() { ui.apRun = null; ACTIONS.accountFirst(); },
+    accountFirst() {
+      // Scroll + focus happen in render() once Settings is on screen: the hashchange re-render would
+      // otherwise replace the form and drop the focus.
+      ui.focusAcct = true;
+      go('#/settings');
+    },
   };
   let lastNav = false; // true once we have navigated inside the app (so history.back stays in-app)
-  window.addEventListener('hashchange', () => { lastNav = true; render(); });
+  window.addEventListener('hashchange', () => { lastNav = true; render(); checkoutReturn(); });
 
   document.addEventListener('click', e => {
     const tab = e.target.closest('.nav [data-tab]');
@@ -1156,6 +1235,29 @@ ${accountSec()}
     });
     if (st === 'expired' && parse().name === 'settings') render();
   };
+  // Premium switched on/off by the server entitlement: re-render so locks update.
+  N3.onEntitlement = () => { if (!acctUi.busy) render(); };
+
+  // Return from Stripe Checkout: success URL is #/settings?checkout=success. Pull once, then report.
+  async function checkoutReturn() {
+    const { name, params } = parse();
+    if (params.get('checkout') !== 'success') return;
+    params.delete('checkout');
+    const q = params.toString();
+    history.replaceState(null, '', location.pathname + location.search + '#/' + name + (q ? '?' + q : ''));
+    lastRoute = null; render();
+    if (!N3.sync.signedIn()) { toast('Payment received — log in to the account you paid with to activate Premium.'); return; }
+    await N3.sync.syncNow();
+    if (S().premium) { render(); toast('Welcome to Premium'); return; }
+    toast('Payment received — Premium activates within a minute.');
+    // The webhook may land a moment after the redirect: check a couple more times quietly.
+    for (const ms of [8000, 20000]) {
+      await new Promise(r => setTimeout(r, ms));
+      await N3.sync.syncNow();
+      if (S().premium) { render(); toast('Welcome to Premium'); return; }
+    }
+  }
+
   // A newer copy came from the cloud: show it (runs in progress keep going on the new state).
   N3.onRemoteAdopt = () => { if (!acctUi.busy) render(); };
 
@@ -1179,5 +1281,6 @@ ${accountSec()}
     $view.innerHTML = '<div class="empty"><b>No word data found</b><p>data/words.js is missing or empty. Run <code>node tools/build-data.js</code>.</p></div>';
   } else {
     render();
+    checkoutReturn();
   }
 })();
