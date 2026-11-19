@@ -344,6 +344,14 @@ details.tx summary::-webkit-details-marker { display: none; }
 .ap-bar { margin-top: 12px; padding: 8px 12px; border: 1px solid var(--rule); border-left: 3px solid var(--or); border-radius: 4px; font-size: 12.5px; color: var(--ink-80); line-height: 1.6; }
 .ap-bar .txtbtn { font-size: 12.5px; padding: 0; text-decoration: underline; text-underline-offset: 2px; }
 .danger { display: block; width: 100%; text-align: left; color: var(--or-t); font-weight: 500; padding: 14px 2px; border-bottom: 1px solid var(--rule); }
+.danger.acct-del { margin-top: 14px; border-top: 1px solid var(--rule); font-size: 14px; }
+.danger:disabled { opacity: .4; }
+/* account deletion: inline confirmation (step 2) */
+.del-confirm { margin-top: 16px; padding: 16px; border: 1px solid var(--or-t); border-radius: 6px; background: var(--card); }
+.del-confirm .h { font-family: var(--mincho); font-weight: 700; font-size: 18px; line-height: 1.4; color: var(--or-t); }
+.del-confirm p { margin-top: 6px; font-size: 14px; color: var(--ink-80); line-height: 1.65; }
+.del-confirm .btns { margin-top: 14px; }
+.btn.danger-btn { background: var(--or-t); border-color: var(--or-t); color: #fff; }
 
 /* paywall */
 .pw { margin-top: 20px; }

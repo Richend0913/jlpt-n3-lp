@@ -828,7 +828,7 @@ ${accountSec()}
   }
 
   // ---------- Account (Settings) ----------
-  const acctUi = { busy: false, msg: '', err: false };
+  const acctUi = { busy: false, msg: '', err: false, del: false, delErr: '' };
   function syncLine(cls = '') {
     const st = N3.sync.status();
     return `<div class="sync ${cls} s-${st}" data-sync><i></i><span>${esc(N3.sync.statusText(st))}</span></div>`;
@@ -841,6 +841,7 @@ ${accountSec()}
   ${syncLine()}
   ${msg}
   <div class="btns"><button class="btn" data-act="syncNow"${acctUi.busy ? ' disabled' : ''}>Sync now</button><button class="btn" data-act="logout">Log out</button></div>
+  ${acctUi.del ? delConfirm() : `<button class="danger acct-del" data-act="deleteAccount"${acctUi.busy ? ' disabled' : ''}>Delete account</button>`}
 </div>`;
     }
     const expired = N3.sync.status() === 'expired';
@@ -854,6 +855,33 @@ ${accountSec()}
   </form>
   ${syncLine()}
 </div>`;
+  }
+  // Step 2 of account deletion: an inline confirmation card (the first tap only opens it).
+  function delConfirm() {
+    const err = acctUi.delErr ? `<p class="acct-msg err" role="alert">${esc(acctUi.delErr)}</p>` : '';
+    return `<div class="del-confirm" id="del-confirm" role="region" aria-labelledby="del-h">
+    <div class="h" id="del-h">Delete your account?</div>
+    <p>This permanently deletes your account (${esc(N3.sync.email())}) and the progress stored on our server. The progress on this device will also be cleared. This can't be undone.</p>
+    ${S().premium ? '<p><b>Premium:</b> deleting the account does not cancel your subscription. To stop billing, email info@mimoria.jp before deleting.</p>' : ''}
+    ${err}
+    <div class="btns"><button class="btn" data-act="deleteCancel"${acctUi.busy ? ' disabled' : ''}>Cancel</button><button class="btn danger-btn" data-act="deleteConfirm"${acctUi.busy ? ' disabled' : ''}>${acctUi.busy ? 'Deleting…' : 'Delete account'}</button></div>
+  </div>`;
+  }
+  async function doDelete() {
+    if (acctUi.busy) return;
+    acctUi.busy = true; acctUi.delErr = ''; render();
+    try {
+      await N3.sync.deleteAccount();
+    } catch (e) {
+      acctUi.busy = false; acctUi.delErr = N3.sync.errorText(e); render();
+      return;
+    }
+    acctUi.busy = false; acctUi.del = false; acctUi.delErr = ''; acctUi.msg = ''; acctUi.err = false;
+    // A guest again: let the "create a free account" reminder come back (the one-time end-screen card stays used).
+    ap.account = false; apSave();
+    ui.session = ui.quiz = ui.mock = ui.listen = ui.read = null;
+    render();
+    toast('Account deleted');
   }
   async function doAuth(kind) {
     if (acctUi.busy) return;
@@ -1186,7 +1214,11 @@ ${paywallPlans(yr)}`;
 
     authLogin() { doAuth('login'); },
     authSignup() { doAuth('signup'); },
+    deleteAccount() { acctUi.del = true; acctUi.delErr = ''; render(); const el = document.getElementById('del-confirm'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' }); },
+    deleteCancel() { acctUi.del = false; acctUi.delErr = ''; render(); },
+    deleteConfirm() { doDelete(); },
     logout() {
+      acctUi.del = false;
       if (!confirm('Log out? Your progress stays on this device; it will no longer sync.')) return;
       N3.sync.logout(); acctUi.msg = ''; render(); toast('Logged out');
     },

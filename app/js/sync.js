@@ -201,6 +201,8 @@
     weak_password: 'Use at least 8 characters for your password.',
     email_taken: 'An account with this email already exists — log in instead.',
     invalid_credentials: 'Email or password is incorrect.',
+    unauthorized: 'Your session has expired. Log in again, then delete the account.',
+    login_again: 'Please log out and log in again, then delete the account.',
     network: "Can't reach the server. Check your connection and try again.",
   };
   function errorText(e) {
@@ -230,6 +232,21 @@
       setStatus('off');
     },
     syncNow: () => run(() => pull(false)),
+    // Deletes the account and its cloud progress on the server, then this device's copy.
+    // Nothing local is touched unless the server confirmed the deletion (throws ApiError otherwise).
+    async deleteAccount() {
+      if (!signedIn()) throw new ApiError('unauthorized', 401);
+      clearTimeout(timer); timer = null;
+      if (inflight) { try { await inflight; } catch (e) {} }
+      await api('DELETE', '/account', undefined, true);
+      acct = null;
+      writeJson(ACCT_KEY, null);
+      meta = { owner: null, syncedAt: 0 };
+      writeJson(SYNC_KEY, null);
+      N3.setPremium(false);
+      N3.resetAll();   // signed out now, so this save is not pushed anywhere
+      setStatus('off');
+    },
   };
 
   // ---------- backup (no account needed) ----------
