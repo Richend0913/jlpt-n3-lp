@@ -974,7 +974,7 @@ ${paywallPlans(yr)}`;
     if (S().premium) {
       const p = N3.sync.plan();
       return `<div class="pw-on" id="pw-active"><b>Premium is active</b>${p ? `<span>${PLAN_NAME[p]} plan</span>` : ''}</div>
-<p class="fine">Every unit, conversation and passage is open on this account.</p>`;
+<p class="fine">Every unit, conversation and passage is open on this account. To manage or cancel your subscription, email info@mimoria.jp and we will take care of it.</p>`;
     }
     const cards = `<div class="plans">
   <button class="plan-o${yr ? ' on' : ''}" data-act="plan" data-arg="year" data-plan="yearly"><span class="rad"></span><span class="t">Yearly <span class="save">SAVE 61%</span><small>$5.00 a month, billed yearly</small></span><span class="pr">$59.99<small>per year</small></span></button>

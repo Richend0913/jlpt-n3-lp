@@ -14,7 +14,7 @@
   const PROD_API = 'https://jlpt-account.burningbros.workers.dev';
   // Stripe Payment Links (filled in once Stripe is connected; empty = checkout not open yet).
   // Each link carries metadata plan=monthly|yearly; success URL .../app/#/settings?checkout=success
-  const PAY_LINKS = { monthly: '', yearly: '' };
+  const PAY_LINKS = { monthly: 'https://buy.stripe.com/test_28E3cv8PidNPeaZeagdby00', yearly: 'https://buy.stripe.com/test_14AcN5aXq5hj9UJ6HOdby01' };
   N3.PAY_LINKS = PAY_LINKS;
   function apiBase() {
     let o = null;
