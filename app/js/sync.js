@@ -188,8 +188,16 @@
   };
 
   // ---------- account ----------
-  async function authenticate(path, email, password) {
-    const j = await api('POST', path, { email, password });
+  // Acquisition channel: first ?ref=<v> seen on this device wins; sent once with signup.
+  const REF_KEY = 'n3_ref';
+  try {
+    const r = new URLSearchParams(location.search).get('ref');
+    if (r && !localStorage.getItem(REF_KEY)) localStorage.setItem(REF_KEY, r.slice(0, 64));
+  } catch (e) {}
+  function storedRef() { try { return localStorage.getItem(REF_KEY) || ''; } catch (e) { return ''; } }
+
+  async function authenticate(path, email, password, extra) {
+    const j = await api('POST', path, Object.assign({ email, password }, extra));
     acct = { token: j.token, exp: j.exp, id: j.user.id, email: j.user.email };
     writeJson(ACCT_KEY, acct);
     await run(() => pull(false));
@@ -222,7 +230,7 @@
     status: () => (signedIn() ? status : acct && acct.email ? 'expired' : 'off'),
     statusText: s => STATUS_TEXT[s || N3.sync.status()] || '',
     errorText,
-    signup: (email, password) => authenticate('/auth/signup', email, password),
+    signup: (email, password) => { const ref = storedRef(); return authenticate('/auth/signup', email, password, ref ? { ref } : undefined); },
     login: (email, password) => authenticate('/auth/login', email, password),
     logout() {
       clearTimeout(timer);
