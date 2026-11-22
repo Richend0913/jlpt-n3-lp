@@ -191,5 +191,8 @@
 <script>
 (function(){var r=new URLSearchParams(location.search).get('ref');if(!r)return;document.querySelectorAll('a[href="./app/"]').forEach(function(a){a.href='./app/?ref='+encodeURIComponent(r);});})();
 </script>
+<script data-pv-beacon>
+(function(){try{if(location.hostname!=='n3.mimoria.jp')return;var q=new URLSearchParams(location.search),b=new URLSearchParams({p:'lp',r:q.get('ref')||''}),u='https://jlpt-account.burningbros.workers.dev/hit';if(!(navigator.sendBeacon&&navigator.sendBeacon(u,b)))fetch(u,{method:'POST',body:b,keepalive:true,mode:'no-cors'}).catch(function(){});}catch(e){}})();
+</script>
 </body>
 </html>
