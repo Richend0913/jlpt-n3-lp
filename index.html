@@ -10,7 +10,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="N3 Tango">
-<title>N3 Deck (working title) — JLPT N3 vocabulary, checked by a native speaker</title>
+<title>N3 Tango — JLPT N3 vocabulary, checked by a native speaker</title>
+<meta name="description" content="N3 Tango: 1,000 JLPT N3 words with audio, grammar, listening, reading and mock tests. Free units to start; Premium is $29.99 one-time.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="N3 Tango">
+<meta property="og:title" content="N3 Tango — JLPT N3 vocabulary, checked by a native speaker">
+<meta property="og:description" content="1,000 JLPT N3 words with audio, grammar, listening, reading and mock tests. Premium $29.99 one-time.">
 <link rel="canonical" href="https://n3.mimoria.jp/">
 <meta property="og:url" content="https://n3.mimoria.jp/">
 <style>
@@ -27,26 +32,20 @@
   h2 { font-size:23px; font-weight:900; margin-bottom:12px; }
   h2 .accent { color:#ff7a1a; }
   p { color:#c7d3e6; font-size:15.5px; }
-  .pains { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px; }
-  .pains .p { background:#101f3a; border:1px solid #22365c; border-radius:12px; padding:14px 16px; font-size:14.5px; color:#dbe5f2; }
-  .pains .p b { color:#ffb066; display:block; margin-bottom:4px; font-size:14px; }
   .fixes { margin-top:16px; display:flex; flex-direction:column; gap:10px; }
   .fixes .f { background:#0f2e17; border:1px solid #2c6e3f; border-radius:12px; padding:14px 16px; font-size:15px; }
   .fixes .f b { color:#8fe3a8; }
   .honest { background:#2a1a08; border:1px solid #7a4a12; border-radius:12px; padding:18px 20px; }
   .honest b { color:#ffb066; }
-  form { background:#101f3a; border:1px solid #22365c; border-radius:14px; padding:24px; margin-top:18px; }
-  .q { margin-bottom:20px; }
-  .q .qt { font-weight:800; margin-bottom:10px; font-size:15.5px; }
-  .opts { display:flex; flex-direction:column; gap:8px; }
-  .opts label { background:#0d1526; border:1px solid #2a3c5f; border-radius:10px; padding:11px 14px; font-size:15px; cursor:pointer; display:flex; gap:10px; align-items:center; }
-  .opts input { accent-color:#ff7a1a; width:18px; height:18px; }
-  .txt { width:100%; background:#0d1526; border:1px solid #2a3c5f; border-radius:10px; padding:12px 14px; color:#fff; font-size:15px; }
-  textarea.txt { min-height:76px; resize:vertical; }
-  .submit { width:100%; background:#ff7a1a; color:#fff; font-weight:800; font-size:17px; border:none; padding:15px; border-radius:10px; cursor:pointer; }
-  .done-panel { display:none; background:#0f2e17; border:1px solid #2c6e3f; border-radius:12px; padding:22px; text-align:center; margin-top:18px; }
   .trybox { margin-top:22px; background:#101f3a; border:1px solid #ff7a1a; border-radius:14px; padding:20px; text-align:center; }
   .trybtn { display:inline-block; background:#ff7a1a; color:#fff; font-weight:800; font-size:18px; text-decoration:none; padding:15px 34px; border-radius:10px; }
+  .ctas { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+  .trybtn.ghost { background:transparent; border:2px solid #ff7a1a; padding:13px 30px; }
+  .facts { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px; }
+  .facts .p { background:#101f3a; border:1px solid #22365c; border-radius:12px; padding:14px 16px; font-size:14.5px; color:#dbe5f2; }
+  .facts .p b { color:#ffb066; display:block; margin-bottom:4px; font-size:14px; }
+  footer .op { margin-top:10px; }
+  footer .op a { color:#9fb2cc; }
   .trybox p { margin-top:10px; font-size:13.5px; color:#9fb2cc; }
   .trybox p.a2hs { display:inline-block; margin-top:14px; padding:6px 14px; border:1px solid #2a3c5f; border-radius:999px; font-size:13px; color:#c7d3e6; }
   .plansx { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px; }
@@ -68,32 +67,32 @@
   footer { padding:24px 0 40px; font-size:12px; color:#7e90ad; border-top:1px solid #1b2a47; }
   footer nav { margin-bottom:10px; }
   footer nav a { color:#9fb2cc; margin-right:14px; font-size:13px; }
-  @media (max-width:680px){ h1{font-size:28px} .pains{grid-template-columns:1fr} .plansx{grid-template-columns:1fr} }
+  @media (max-width:680px){ h1{font-size:28px} .facts{grid-template-columns:1fr} .plansx{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>N3<span class="accent">Deck</span><span class="tag">working title</span></header>
+  <header>N3 <span class="accent">Tango</span></header>
 
   <h1>JLPT N3 words,<br>checked by a <span class="accent">native speaker</span>.<br>Every single one.</h1>
   <p class="lead">Most JLPT apps now generate their questions, example sentences and audio with AI — and learners keep finding the mistakes. This is a small N3-only vocabulary app where a native Japanese speaker checks every word, reading, example sentence and recording before it ships.</p>
 
   <div class="trybox">
-    <a class="trybtn" href="./app/">Try the free web version</a>
+    <div class="ctas">
+      <a class="trybtn" data-buy href="https://buy.stripe.com/dRm5kCcCz5bg84c3nl9Zm02">Get Premium — $29.99 one-time</a>
+      <a class="trybtn ghost" href="./app/">Open the app (free units)</a>
+    </div>
     <p>1,000 N3 words with audio, quizzes and spaced repetition — right in your browser, no install. <span data-paid>The first units are free.</span></p>
     <p class="a2hs">No app store needed — add it to your Home Screen and it works like an app, even offline.</p>
   </div>
 
   <section>
-    <h2>What learners <span class="accent">keep complaining about</span></h2>
-    <p>From real App Store reviews of the current JLPT apps:</p>
-    <div class="pains">
-      <div class="p"><b>AI content with errors</b>"There are multiple errors in questions and answers, and most of the content is not level appropriate."</div>
-      <div class="p"><b>Wrong levels</b>"The readings at N2 level contain mostly N1 kanji — not suited to the level it claims."</div>
-      <div class="p"><b>Offline is broken</b>"Deletes downloaded data. Doesn't work properly in offline mode."</div>
-      <div class="p"><b>Ads even after paying</b>"Ruined by ads even with Premium — despite having bought lifetime premium."</div>
-      <div class="p"><b>Chaotic pricing</b>Dozens of overlapping plans and prices, and subscriptions that are hard to cancel.</div>
-      <div class="p"><b>Robotic audio</b>"Words mispronounced, weird unnatural robot speech."</div>
+    <h2>What's <span class="accent">inside</span></h2>
+    <div class="facts">
+      <div class="p"><b>1,000 N3 words</b>Strictly N3 vocabulary in 50 units, each with its reading, meaning and an example sentence.</div>
+      <div class="p"><b>Audio for every word</b>Each of the 1,000 words and its example sentence has standard Japanese audio (VOICEVOX voice).</div>
+      <div class="p"><b>Mock exam format</b>Mock tests in the three JLPT N3 sections (Vocabulary, Grammar &amp; Reading, Listening), scored against the real pass marks: 19/60 per section, 95/180 overall.</div>
+      <div class="p"><b>Listening and reading</b>40 listening conversations and 18 reading passages alongside the grammar units.</div>
     </div>
   </section>
 
@@ -105,14 +104,14 @@
       <div class="f"><b>Fully offline.</b> Download once, study on the plane, on the train, anywhere. Your data stays on your phone.</div>
       <div class="f"><b>No ads. No notification spam.</b> Paying users are never shown ads. Ever.</div>
       <div class="f"><b>One price, paid once.</b> $29.99 one-time for lifetime access. No subscription, nothing to cancel, no dark patterns.</div>
-      <div class="f"><b>Built around the exam.</b> A countdown to the next JLPT (held every July and December) and a pace that gets you through the deck before test day.</div>
+      <div class="f"><b>Built around the exam.</b> A countdown to the next JLPT (held every July and December) and a pace that gets you through all 1,000 words before test day.</div>
     </div>
   </section>
 
   <section>
-    <h2>The honest part</h2>
+    <h2>Premium is <span class="accent">on sale now</span></h2>
     <div class="honest">
-      <p><b>The web version is live.</b> You can study right now, free, in your browser — the full app-store release with the complete premium deck comes next. Join the waitlist below to get the launch notice and launch pricing locked in. Nobody is charged anything for joining.</p>
+      <p><b>$29.99, paid once.</b> Buy below and unlock every unit for good. No subscription, nothing to cancel. Prefer to try first? The free units in the web app need no account.</p>
     </div>
   </section>
 
@@ -146,59 +145,24 @@
       </div>
     </div>
     <div class="pricenote">
-      <p data-paid>Lifetime Premium is $29.99, paid once — upgrade any time from the app. Start with the free units today.</p>
-      <a class="trybtn" href="./app/">Try the free web version</a>
+      <p data-paid>Lifetime Premium is $29.99, paid once. Secure checkout by Stripe.</p>
+      <div class="ctas" style="margin-top:12px">
+        <a class="trybtn" data-buy href="https://buy.stripe.com/dRm5kCcCz5bg84c3nl9Zm02">Get Premium — $29.99 one-time</a>
+        <a class="trybtn ghost" href="./app/">Open the app (free units)</a>
+      </div>
+      <p style="margin-top:12px;font-size:13.5px;color:#9fb2cc">Already have a free account? Sign in to the app on this device before buying and Premium unlocks automatically. Bought without an account? Email <a href="mailto:info@mimoria.jp" style="color:#c7d3e6">info@mimoria.jp</a> from the address you paid with and we will activate Premium for you.</p>
     </div>
   </section>
 
-  <section>
-    <form id="entry" action="https://formsubmit.co/info@mimoria.jp" method="POST">
-      <input type="hidden" name="_subject" value="[JLPT N3] Waitlist registration">
-      <input type="hidden" name="_template" value="table">
-      <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_next" value="https://n3.mimoria.jp/?done=1">
-      <div class="q">
-        <div class="qt">1. Are you studying for JLPT N3?</div>
-        <div class="opts">
-          <label><input type="radio" name="Studying N3" value="Yes, exam booked or planned"> Yes — exam booked or planned</label>
-          <label><input type="radio" name="Studying N3" value="Studying, no exam date yet"> Studying, no exam date yet</label>
-          <label><input type="radio" name="Studying N3" value="Different level"> No — a different level</label>
-        </div>
-      </div>
-      <div class="q">
-        <div class="qt">2. Would you pay $12.99/month for a fully native-checked N3 deck?</div>
-        <div class="opts">
-          <label><input type="radio" name="Would pay 12.99" value="Yes"> Yes</label>
-          <label><input type="radio" name="Would pay 12.99" value="Depends on quality"> Depends on the quality</label>
-          <label><input type="radio" name="Would pay 12.99" value="No"> No</label>
-        </div>
-      </div>
-      <div class="q">
-        <div class="qt">3. What frustrates you about the JLPT app you use now? (optional)</div>
-        <textarea class="txt" name="Frustration" placeholder="e.g. wrong answers, too many ads, bad audio..."></textarea>
-      </div>
-      <div class="q">
-        <div class="qt">4. Email for the launch notice</div>
-        <input class="txt" type="email" name="Email" placeholder="you@example.com">
-      </div>
-      <button class="submit" type="submit">Join the waitlist</button>
-    </form>
-    <div class="done-panel" id="done">
-      <b style="font-size:18px;">You're on the list.</b>
-      <p style="margin-top:8px;">Thanks for registering. You'll be the first to know when the full version launches — with launch pricing locked in. In the meantime, the free web version above is ready to use.</p>
-    </div>
-  </section>
 
   <footer>
     <nav><a href="/vocabulary/">JLPT N3 vocabulary list</a><a href="/guide/">JLPT N3 exam guide</a></nav>
-    The free web version of this app is available now at the link above. This waitlist is for the full app-store launch; no payment is taken. Your email is used only for the launch notice.
+    <div class="op">Operated by MIMORIA Inc. (株式会社MIMORIA) — Contact: <a href="mailto:info@mimoria.jp">info@mimoria.jp</a></div>
   </footer>
 </div>
 <script>
-  if (new URLSearchParams(location.search).get('done') === '1') {
-    document.getElementById('done').style.display = 'block';
-    document.getElementById('done').scrollIntoView({behavior:'smooth'});
-  }
+// Signed-in app account on this origin: tag the buy link so the purchase unlocks Premium automatically.
+(function(){try{var a=JSON.parse(localStorage.getItem('n3tango.account.v1'));if(!a||!a.token||!(a.exp*1000>Date.now()))return;var p=a.token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');var sub=JSON.parse(atob(p+'==='.slice((p.length+3)%4))).sub;if(typeof sub!=='string'||!sub)return;document.querySelectorAll('a[data-buy]').forEach(function(l){l.href=l.href.split('?')[0]+'?client_reference_id='+encodeURIComponent(sub)+(a.email?'&prefilled_email='+encodeURIComponent(a.email):'');});}catch(e){}})();
 </script>
 <script>
 (function(){var r=new URLSearchParams(location.search).get('ref');if(!r)return;document.querySelectorAll('a[href="./app/"]').forEach(function(a){a.href='./app/?ref='+encodeURIComponent(r);});})();
