@@ -8,10 +8,10 @@
   N3.DAILY_NEW_OPTIONS = [5, 10, 15, 20];
   N3.FREE_UNITS = 2; // SPEC.md: first 2 units free, paywall after
 
-  // Exam launch promo (owner decision 2026-11-23): everything is open to everyone until the end of the
-  // Dec 6 exam day in Japan. The paywall returns by itself after this instant; every gate goes through
-  // N3.hasAccess(), so this constant is the only switch.
-  N3.FREE_UNTIL = '2026-12-06T23:59:59+09:00';
+  // Free-period switch. The exam promo was ended early (owner decision 2026-11-23 13:48: paid now), so
+  // this instant is in the past and every gate falls back to the entitlement. All gates go through
+  // N3.hasAccess(); set a future instant here to reopen a free period.
+  N3.FREE_UNTIL = '2026-11-23T00:00:00+09:00';
   N3.isFreePeriod = (now = Date.now()) => now < Date.parse(N3.FREE_UNTIL) + 1000;
   N3.hasAccess = () => !!(N3.state && N3.state.premium) || N3.isFreePeriod();
 

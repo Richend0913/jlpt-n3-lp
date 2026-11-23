@@ -566,8 +566,8 @@ ${hd(esc(t('nav.practice')), { right: gearBtn() })}
 <div class="sec">${secHead('Drills', '練習')}
 <div class="rows">
   <a class="row" href="#/quiz"><span class="k" lang="ja">問</span><span class="t">Quiz<span class="sub">Vocabulary 4-choice, grammar fill-in and sentence order</span></span><span class="arr">${I('next')}</span></a>
-  <a class="row" href="#/listening"><span class="k" lang="ja">聴</span><span class="t">Listening<span class="sub">${lAns} of ${N3.LISTENING.length} conversations answered · ${freeNow() ? 'all free until Dec 6' : `${N3.FREE_LISTENING} free`}</span></span><span class="arr">${I('next')}</span></a>
-  <a class="row" href="#/reading"><span class="k" lang="ja">読</span><span class="t">Reading<span class="sub">${rAns} of ${N3.READING.length} passages read · ${freeNow() ? 'all free until Dec 6' : `${N3.FREE_READING} free`}</span></span><span class="arr">${I('next')}</span></a>
+  <a class="row" href="#/listening"><span class="k" lang="ja">聴</span><span class="t">Listening<span class="sub">${lAns} of ${N3.LISTENING.length} conversations answered · ${freeNow() ? 'all free for now' : `${N3.FREE_LISTENING} free`}</span></span><span class="arr">${I('next')}</span></a>
+  <a class="row" href="#/reading"><span class="k" lang="ja">読</span><span class="t">Reading<span class="sub">${rAns} of ${N3.READING.length} passages read · ${freeNow() ? 'all free for now' : `${N3.FREE_READING} free`}</span></span><span class="arr">${I('next')}</span></a>
 </div></div>
 <div class="sec">${secHead('Mock test', '模試')}
 <div class="rows">
