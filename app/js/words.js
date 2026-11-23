@@ -14,7 +14,7 @@
   N3.UNITS = [...new Set(N3.WORDS.map(w => w.unit))].sort((a, b) => a - b);
   N3.unitWords = u => N3.WORDS.filter(w => w.unit === u);
 
-  N3.isUnitOpen = u => N3.state.premium || u <= N3.FREE_UNITS;
+  N3.isUnitOpen = u => N3.hasAccess() || u <= N3.FREE_UNITS;
   N3.openWords = () => N3.WORDS.filter(w => N3.isUnitOpen(w.unit));
 
   N3.POS_LABEL = {

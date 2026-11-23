@@ -53,6 +53,8 @@
   .plansx li::before { content:"✓"; position:absolute; left:0; color:#8fe3a8; font-weight:800; }
   .plansx .o .note { font-size:13px; color:#9fb2cc; margin-top:10px; }
   .pricenote { margin-top:16px; text-align:center; }
+  .trybox .freeline { display:inline-block; margin-top:0; margin-bottom:14px; padding:8px 14px; border-radius:999px; background:#ff7a1a22; border:1px solid #ff7a1a; color:#fff; font-weight:800; font-size:15.5px; }
+  .freeprice { margin-top:10px; padding:12px 16px; border:1px solid #ff7a1a; border-radius:10px; background:#101f3a; color:#fff; font-weight:800; font-size:17px; text-align:center; }
   .pricenote p { font-size:14.5px; }
   .pricenote .trybtn { margin-top:12px; font-size:16px; padding:13px 28px; }
   footer { padding:24px 0 40px; font-size:12px; color:#7e90ad; border-top:1px solid #1b2a47; }
@@ -69,8 +71,9 @@
   <p class="lead">Most JLPT apps now generate their questions, example sentences and audio with AI — and learners keep finding the mistakes. This is a small N3-only vocabulary app where a native Japanese speaker checks every word, reading, example sentence and recording before it ships.</p>
 
   <div class="trybox">
+    <p class="freeline" data-free>Everything is free until Dec 6 — good luck on the exam!</p><br data-free>
     <a class="trybtn" href="./app/">Try the free web version</a>
-    <p>1,000 N3 words with audio, quizzes and spaced repetition — right in your browser, no install. The first units are free.</p>
+    <p>1,000 N3 words with audio, quizzes and spaced repetition — right in your browser, no install. <span data-free>All units, grammar, listening, reading and mock tests are free until Dec 6, 2026.</span><span data-paid hidden>The first units are free.</span></p>
   </div>
 
   <section>
@@ -107,6 +110,7 @@
 
   <section id="pricing">
     <h2>Pricing</h2>
+    <p class="freeprice" data-free>Free until Dec 6, 2026 — then $12.99/mo or $59.99/yr</p>
     <div class="plansx">
       <div class="o">
         <div class="nm">Free</div>
@@ -134,7 +138,8 @@
       </div>
     </div>
     <div class="pricenote">
-      <p>Premium checkout opens shortly. The free web version is live now — start with the free units today.</p>
+      <p data-free>Free until Dec 6, 2026 — then $12.99/mo or $59.99/yr. Everything is open now, no payment needed.</p>
+      <p data-paid hidden>Premium checkout opens shortly. The free web version is live now — start with the free units today.</p>
       <a class="trybtn" href="./app/">Try the free web version</a>
     </div>
   </section>
@@ -193,6 +198,14 @@
 </script>
 <script data-pv-beacon>
 (function(){try{if(location.hostname!=='n3.mimoria.jp')return;var q=new URLSearchParams(location.search),b=new URLSearchParams({p:'lp',r:q.get('ref')||''}),u='https://jlpt-account.burningbros.workers.dev/hit';if(!(navigator.sendBeacon&&navigator.sendBeacon(u,b)))fetch(u,{method:'POST',body:b,keepalive:true,mode:'no-cors'}).catch(function(){});}catch(e){}})();
+</script>
+<script>
+(function () {
+  var FREE_UNTIL = '2026-12-06T23:59:59+09:00';
+  if (Date.now() < Date.parse(FREE_UNTIL) + 1000) return;
+  document.querySelectorAll('[data-free]').forEach(function (e) { e.remove(); });
+  document.querySelectorAll('[data-paid]').forEach(function (e) { e.hidden = false; });
+})();
 </script>
 </body>
 </html>

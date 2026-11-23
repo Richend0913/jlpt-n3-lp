@@ -173,6 +173,7 @@
     return `
 <div class="hd"><div class="logo">N3 <span>Tango</span></div><div class="right">${gearBtn()}</div></div>
 ${dateLine()}
+${freeBanner()}
 ${acctBanner()}
 <div class="sec">${secHead('Today')}
   ${today}
@@ -194,6 +195,10 @@ ${w ? `<div class="entry">
 
   // Shown outside the paywall (Settings row, locked dividers); the plan cards carry the full prices.
   const PRICE_MO = '$12.99/mo', PRICE_YR = '$59.99/yr';
+  // Free period (N3.FREE_UNTIL in store.js): one message replaces every upgrade prompt until it ends.
+  const FREE_MSG = 'Everything is free until Dec 6 — good luck on the exam!';
+  const freeNow = () => N3.isFreePeriod();
+  const freeBanner = () => (freeNow() ? `<p class="free-bar" id="free-banner">${esc(FREE_MSG)}</p>` : '');
 
   // ---------- Learn: two tracks ----------
   function vocabToc() {
@@ -477,8 +482,8 @@ ${hd('Practice', { right: gearBtn() })}
 <div class="sec">${secHead('Drills', '練習')}
 <div class="rows">
   <a class="row" href="#/quiz"><span class="k" lang="ja">問</span><span class="t">Quiz<span class="sub">Vocabulary 4-choice, grammar fill-in and sentence order</span></span><span class="arr">${I('next')}</span></a>
-  <a class="row" href="#/listening"><span class="k" lang="ja">聴</span><span class="t">Listening<span class="sub">${lAns} of ${N3.LISTENING.length} conversations answered · ${N3.FREE_LISTENING} free</span></span><span class="arr">${I('next')}</span></a>
-  <a class="row" href="#/reading"><span class="k" lang="ja">読</span><span class="t">Reading<span class="sub">${rAns} of ${N3.READING.length} passages read · ${N3.FREE_READING} free</span></span><span class="arr">${I('next')}</span></a>
+  <a class="row" href="#/listening"><span class="k" lang="ja">聴</span><span class="t">Listening<span class="sub">${lAns} of ${N3.LISTENING.length} conversations answered · ${freeNow() ? 'all free until Dec 6' : `${N3.FREE_LISTENING} free`}</span></span><span class="arr">${I('next')}</span></a>
+  <a class="row" href="#/reading"><span class="k" lang="ja">読</span><span class="t">Reading<span class="sub">${rAns} of ${N3.READING.length} passages read · ${freeNow() ? 'all free until Dec 6' : `${N3.FREE_READING} free`}</span></span><span class="arr">${I('next')}</span></a>
 </div></div>
 <div class="sec">${secHead('Mock test', '模試')}
 <div class="rows">
@@ -819,8 +824,8 @@ ${accountSec()}
   <div class="kv"><span>Words</span><b>${N3.num(N3.WORDS.length)} · ${plural(N3.UNITS.length, 'unit')}</b></div>
   <div class="kv"><span>Grammar patterns</span><b>${N3.GRAMMAR.length} · ${plural(N3.G_UNITS.length, 'unit')}</b></div>
   <div class="kv"><span>Listening · reading</span><b>${N3.LISTENING.length} · ${N3.READING.length}</b></div>
-  <div class="kv"><span>Free</span><b class="t">${unitRangeText()}, grammar units 1–${N3.FREE_G_UNITS}, ${N3.FREE_LISTENING} conversations, ${N3.FREE_READING} passages</b></div>
-  <div class="kv"><span>Premium</span><b class="t" data-go="#/paywall">${S().premium ? 'Active' : `See plans<small class="kv-sub">${PRICE_MO} · ${PRICE_YR}</small>`}</b></div>
+  <div class="kv"><span>Free</span><b class="t">${freeNow() ? 'Everything, until Dec 6' : `${unitRangeText()}, grammar units 1–${N3.FREE_G_UNITS}, ${N3.FREE_LISTENING} conversations, ${N3.FREE_READING} passages`}</b></div>
+  <div class="kv"><span>Premium</span><b class="t" data-go="#/paywall">${S().premium ? 'Active' : freeNow() ? `Starts after Dec 6<small class="kv-sub">${PRICE_MO} · ${PRICE_YR}</small>` : `See plans<small class="kv-sub">${PRICE_MO} · ${PRICE_YR}</small>`}</b></div>
   <div class="kv"><span>Voice</span><b class="t" lang="ja">VOICEVOX:春日部つむぎ</b></div>
 </div></div>
 <div class="sec"><button class="danger" data-act="reset">Reset all progress</button></div>
@@ -942,6 +947,7 @@ ${accountSec()}
   // ---------- Paywall ----------
   function viewPaywall(params) {
     const yr = ui.plan === 'year';
+    if (freeNow() && !S().premium) return viewPaywallFree();
     let what = '';
     if (params.get('unit')) what = `Vocabulary unit ${esc(params.get('unit'))} is part of Premium. `;
     else if (params.get('gunit')) what = `Grammar unit ${esc(params.get('gunit'))} is part of Premium. `;
@@ -959,6 +965,24 @@ ${accountSec()}
   <div>${I('check')}Works offline</div>
 </div>
 ${paywallPlans(yr)}`;
+  }
+
+  // Free period: the Premium screen stays reachable but sells nothing; registration is offered only as sync.
+  function viewPaywallFree() {
+    const acct = N3.sync.signedIn() ? ''
+      : `<button class="btn primary start" data-act="accountFirst" id="pw-account">Create a free account to save your progress</button>
+<p class="fine">Optional. An account keeps your progress safe and syncs it across devices.</p>`;
+    return `
+<div class="runtop"><button class="icon-btn" data-act="back" aria-label="Close">${I('close')}</button></div>
+<div class="pw" id="pw-free"><h1>${esc(FREE_MSG)}</h1>
+  <p>Premium starts after Dec 6: $12.99/mo or $59.99/yr. Until then, everything is free.</p></div>
+<div class="feats">
+  <div>${I('check')}${N3.num(N3.WORDS.length)} words in ${N3.UNITS.length} units, with example audio</div>
+  <div>${I('check')}${N3.GRAMMAR.length} grammar patterns with example audio</div>
+  <div>${I('check')}${N3.LISTENING.length} listening conversations, ${N3.READING.length} reading passages</div>
+  <div>${I('check')}Mock tests drawn from everything</div>
+</div>
+${acct}`;
   }
 
   const PLAN_NAME = { monthly: 'Monthly', yearly: 'Yearly' };

@@ -8,6 +8,13 @@
   N3.DAILY_NEW_OPTIONS = [5, 10, 15, 20];
   N3.FREE_UNITS = 2; // SPEC.md: first 2 units free, paywall after
 
+  // Exam launch promo (owner decision 2026-11-23): everything is open to everyone until the end of the
+  // Dec 6 exam day in Japan. The paywall returns by itself after this instant; every gate goes through
+  // N3.hasAccess(), so this constant is the only switch.
+  N3.FREE_UNTIL = '2026-12-06T23:59:59+09:00';
+  N3.isFreePeriod = (now = Date.now()) => now < Date.parse(N3.FREE_UNTIL) + 1000;
+  N3.hasAccess = () => !!(N3.state && N3.state.premium) || N3.isFreePeriod();
+
   N3.DAILY_GRAMMAR_OPTIONS = [2, 3, 5];
   N3.SEC_KEYS = ['lk', 'rd', 'ls'];       // JLPT N3 scoring sections: language knowledge, reading, listening
   N3.SEC_RECENT = 50;                      // answers kept per section for the score estimate

@@ -15,7 +15,7 @@
   N3.G_BY_ID = Object.fromEntries(N3.GRAMMAR.map(g => [g.id, g]));
   N3.G_UNITS = [...new Set(N3.GRAMMAR.map(g => g.unit))];
   N3.gUnitItems = u => N3.GRAMMAR.filter(g => g.unit === u);
-  N3.isGUnitOpen = u => N3.state.premium || u <= N3.FREE_G_UNITS;
+  N3.isGUnitOpen = u => N3.hasAccess() || u <= N3.FREE_G_UNITS;
   N3.openGrammar = () => N3.GRAMMAR.filter(g => N3.isGUnitOpen(g.unit));
 
   // ---------- listening / reading ----------
@@ -25,8 +25,8 @@
   N3.READING = (Array.isArray(window.N3_READING) ? window.N3_READING : []).map((x, i) => Object.assign({}, x, { _i: i, no: i + 1 }));
   N3.L_BY_ID = Object.fromEntries(N3.LISTENING.map(x => [x.id, x]));
   N3.R_BY_ID = Object.fromEntries(N3.READING.map(x => [x.id, x]));
-  N3.isListenOpen = x => N3.state.premium || x._i < N3.FREE_LISTENING;
-  N3.isReadOpen = x => N3.state.premium || x._i < N3.FREE_READING;
+  N3.isListenOpen = x => N3.hasAccess() || x._i < N3.FREE_LISTENING;
+  N3.isReadOpen = x => N3.hasAccess() || x._i < N3.FREE_READING;
   N3.openListening = () => N3.LISTENING.filter(N3.isListenOpen);
   N3.openReading = () => N3.READING.filter(N3.isReadOpen);
   N3.L_SET = 10;              // listening is grouped in sets of 10 on the list screen
