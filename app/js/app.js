@@ -136,6 +136,51 @@
   }
   const acctBanner = () => (hasAccount() ? '' : `<p class="ap-bar" id="acct-banner">${esc(t('acct.banner'))} <button class="txtbtn" data-act="accountFirst">${esc(t('acct.createFree'))}</button></p>`);
 
+  // ---------- Premium conversion prompts ----------
+  // (1) Once per user (localStorage flag): the session that completes the last item of the last free unit
+  //     (vocabulary unit FREE_UNITS or grammar unit FREE_G_UNITS) ends with a save-progress + Premium card.
+  // (2) Every mock-test result screen of a non-Premium user carries the Premium CTA (+ signup when signed out).
+  // Nowhere else: no popups, nothing on first open.
+  const LEGAL_URL = 'https://n3.mimoria.jp/legal/';
+  const legalLink = () => `<a class="legal" href="${LEGAL_URL}" target="_blank" rel="noopener">${esc(t('legal.link'))}</a>`;
+  const UP_KEY = 'n3tango.unlockPrompt.v1';
+  const upShown = () => { try { return localStorage.getItem(UP_KEY) === '1'; } catch (e) { return false; } };
+  const upMark = () => { try { localStorage.setItem(UP_KEY, '1'); } catch (e) {} };
+  const isFreeUser = () => !S().premium && !freeNow();
+  function lastFreeUnitDone(track) {
+    const pool = track === 'grammar' ? N3.gUnitItems(N3.FREE_G_UNITS) : N3.unitWords(N3.FREE_UNITS);
+    return pool.length > 0 && pool.every(x => N3.isSeen(x.id));
+  }
+  // Signed in: the Payment Link tagged with the account (client_reference_id + prefilled_email). Signed out: the
+  // plain link; the Worker then matches the checkout email to an account, or keeps it pending until signup.
+  const buyUrl = () => checkoutUrl() || N3.LIFETIME_LINK || '';
+  function premiumCtaBtns(idp) {
+    const signedIn = N3.sync.signedIn();
+    const url = buyUrl();
+    return `<div class="btns up-btns">
+  ${url ? `<a class="btn primary" id="${idp}-buy" href="${esc(url)}" rel="noopener">${esc(t('up.buy'))}</a>` : ''}
+  ${signedIn ? '' : `<button class="btn" data-act="upSave" id="${idp}-save">${esc(t('up.save'))}</button>`}
+</div>
+<p class="fine">${signedIn ? '' : esc(t('up.guest')) + ' '}${legalLink()}</p>`;
+  }
+  function unlockCard(s) {
+    const a = N3.FREE_UNITS + 1, ga = N3.FREE_G_UNITS + 1;
+    return `<div class="ap up" id="unlock-prompt" data-track="${s.track}" role="region" aria-labelledby="up-h">
+  <button class="icon-btn x" data-act="upClose" aria-label="${esc(t('up.close'))}">${I('close')}</button>
+  <div class="h" id="up-h">${esc(t(s.track === 'grammar' ? 'up.h.grammar' : 'up.h.vocab'))}</div>
+  <p>${esc(t('up.p', { a, v: N3.UNITS[N3.UNITS.length - 1], ga, g: N3.G_UNITS[N3.G_UNITS.length - 1] }))}</p>
+  ${premiumCtaBtns('up')}
+</div>`;
+  }
+  function mockCta() {
+    if (!isFreeUser()) return '';
+    return `<div class="ap up" id="mock-cta" role="region" aria-labelledby="mk-h">
+  <div class="h" id="mk-h">${esc(t('mk.h'))}</div>
+  <p>${esc(t('mk.p'))}</p>
+  ${premiumCtaBtns('mk')}
+</div>`;
+  }
+
   function startStep(key) {
     if (key === 'vocab') return startSession('vocab', 'today');
     if (key === 'grammar') return startSession('grammar', 'today');
@@ -372,7 +417,8 @@ ${N3.META.source === 'sample' ? '<p class="fine">Sample word list (development b
     const queue = [...due.map(w => ({ id: w.id, kind: 'review' })), ...fresh.map(w => ({ id: w.id, kind: 'new' }))];
     if (!queue.length) return false;
     stopAudio();
-    ui.session = { track, kind, title, queue, idx: 0, revealed: false, total: queue.length, done: 0, firstKnow: 0, requeues: {}, finished: false };
+    ui.session = { track, kind, title, queue, idx: 0, revealed: false, total: queue.length, done: 0, firstKnow: 0, requeues: {}, finished: false,
+      freeDoneBefore: lastFreeUnitDone(track), upsell: false };
     go('#/session');
     return true;
   }
@@ -418,7 +464,7 @@ ${N3.META.source === 'sample' ? '<p class="fine">Sample word list (development b
       return `
 ${hd('Session complete')}
 <div class="score"><span class="big">${s.firstKnow}<small> / ${s.total}</small></span><span class="lbl">known on the first look · ${esc(s.title)}</span></div>
-${acctPrompt(s)}
+${s.upsell ? unlockCard(s) : acctPrompt(s)}
 <div class="kvs">
   <div class="kv"><span>${G ? 'Grammar reviews due now' : 'Word reviews due now'}</span><b>${G ? N3.dueGrammar().length : N3.dueWords().length}</b></div>
   <div class="kv"><span>${G ? 'New patterns today' : 'New words today'}</span><b>${G ? `${d.gNew} / ${S().settings.dailyGrammar}` : `${d.newCount} / ${S().settings.dailyNew}`}</b></div>
@@ -452,6 +498,8 @@ ${actions}`;
     if (s.idx >= s.queue.length) {
       s.finished = true;
       if (s.kind === 'today') { N3.markStep(s.track === 'grammar' ? 'grammar' : 'vocab'); N3.save(); }
+      // This session finished the last free unit of its track: the one-time conversion card.
+      if (isFreeUser() && !s.freeDoneBefore && lastFreeUnitDone(s.track) && !upShown()) { s.upsell = true; upMark(); }
     }
     render();
   }
@@ -814,7 +862,7 @@ ${choicesHtml(q, { reveal: false })}
 ${hd(esc(t('res.title')))}
 <div class="score"><span class="big">${j.total}<small> / 180</small></span><span class="lbl">${esc(t('res.passline'))}</span></div>
 ${verdict}
-${acctPrompt(m)}
+${isFreeUser() ? mockCta() : acctPrompt(m)}
 <div class="secs">
 ${N3.SEC_KEYS.map(k => { const sc = j.scores[k]; const [r, tot] = m.secs[k]; return `<div class="secr" data-sec="${k}"><div class="top"><span class="nm">${esc(secName(k))}<small lang="ja">${esc(N3.SECTIONS[k].jp)}</small></span><span class="sc">${sc}<small> / 60</small></span></div>
   ${meter(sc, 60, N3.SEC_CUTOFF)}
@@ -1088,7 +1136,8 @@ ${acct}`;
     if (!N3.sync.signedIn()) {
       return `${cards}
 <button class="btn primary start" data-act="accountFirst" id="pw-account">${esc(t('pw.first'))}</button>
-<p class="fine">${esc(t('pw.firstFine'))}</p>`;
+<p class="fine">${esc(t('pw.firstFine'))}</p>
+<p class="fine">${legalLink()}</p>`;
     }
     const url = checkoutUrl();
     if (!url) {
@@ -1097,7 +1146,7 @@ ${acct}`;
     }
     return `${cards}
 <a class="btn primary start" id="pw-buy" href="${esc(url)}" rel="noopener">${esc(t('pw.continue', { plan: t('pw.lifetime'), price: t('pw.priceL') }))}</a>
-<p class="fine">${esc(t('pw.stripe'))}</p>`;
+<p class="fine">${esc(t('pw.stripe'))} ${legalLink()}</p>`;
   }
 
   // ---------- Router ----------
@@ -1340,6 +1389,8 @@ ${acct}`;
     plan(arg) { ui.plan = arg; render(); },
     apLater() { ui.apRun = null; render(); },
     apCreate() { ui.apRun = null; ACTIONS.accountFirst(); },
+    upClose() { if (ui.session) ui.session.upsell = false; render(); },
+    upSave() { if (ui.session) ui.session.upsell = false; ap.shown = true; apSave(); ACTIONS.accountFirst(); },
     // Home: one tap from the weakest mock-test section into matching practice.
     fixSec(arg) {
       ui.planRun = false;

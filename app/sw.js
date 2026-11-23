@@ -5,7 +5,7 @@
 //   download up front). Range requests (Safari audio) are answered from the cached full file.
 // Only same-origin GETs inside this scope are handled; the account API and the beacon go straight to the network.
 'use strict';
-const VERSION = 'n3-2026-11-23c';
+const VERSION = 'n3-2026-11-23d';
 const SHELL = `shell-${VERSION}`;
 const MEDIA = 'media-v1';            // audio does not change between deploys: keep it across versions
 const PRECACHE = [

@@ -161,6 +161,16 @@
       'pw.first': 'Create a free account first',
       'pw.firstFine': 'Premium attaches to your account, so it works on every device you sign in on.',
       'pw.soon': 'Online checkout opens shortly.',
+      'up.h.vocab': "You've finished the free vocabulary units",
+      'up.h.grammar': "You've finished the free grammar units",
+      'up.p': 'Premium opens vocabulary units {a}–{v}, grammar units {ga}–{g}, and every listening and reading item.',
+      'up.save': 'Save your progress — free account',
+      'up.buy': 'Unlock everything — Premium $29.99 one-time',
+      'up.guest': 'Paying without an account? Sign up later with the email you paid with and Premium unlocks automatically.',
+      'up.close': 'Close',
+      'mk.h': 'Want every unit before the exam?',
+      'mk.p': 'Premium unlocks all 1,000 words, all grammar, listening and reading — $29.99, paid once.',
+      'legal.link': 'Legal notice (特定商取引法に基づく表記)',
       'pw.continue': 'Continue — {plan}, {price}',
       'pw.stripe': 'Secure payment by Stripe. One payment — nothing renews, nothing to cancel.',
       'ck.login': 'Payment received — log in to the account you paid with to activate Premium.',
@@ -311,6 +321,16 @@
       'pw.first': 'Trước tiên, hãy tạo tài khoản miễn phí',
       'pw.firstFine': 'Premium gắn với tài khoản, nên dùng được trên mọi thiết bị bạn đăng nhập.',
       'pw.soon': 'Thanh toán trực tuyến sẽ sớm mở.',
+      'up.h.vocab': 'Bạn đã học xong các bài từ vựng miễn phí',
+      'up.h.grammar': 'Bạn đã học xong các bài ngữ pháp miễn phí',
+      'up.p': 'Premium mở khóa bài từ vựng {a}–{v}, bài ngữ pháp {ga}–{g}, cùng toàn bộ bài nghe và bài đọc.',
+      'up.save': 'Lưu tiến độ — tài khoản miễn phí',
+      'up.buy': 'Mở khóa tất cả — Premium $29.99, trả một lần',
+      'up.guest': 'Thanh toán khi chưa có tài khoản? Sau đó hãy đăng ký bằng đúng email đã thanh toán, Premium sẽ tự động mở khóa.',
+      'up.close': 'Đóng',
+      'mk.h': 'Muốn học hết mọi bài trước kỳ thi?',
+      'mk.p': 'Premium mở khóa toàn bộ 1.000 từ, toàn bộ ngữ pháp, bài nghe và bài đọc — $29.99, trả một lần.',
+      'legal.link': 'Thông tin pháp lý (特定商取引法に基づく表記)',
       'pw.continue': 'Tiếp tục — {plan}, {price}',
       'pw.stripe': 'Thanh toán an toàn qua Stripe. Chỉ trả một lần — không gia hạn, không cần hủy.',
       'ck.login': 'Đã nhận thanh toán — hãy đăng nhập tài khoản đã dùng để thanh toán để kích hoạt Premium.',
@@ -461,6 +481,16 @@
       'pw.first': 'Buat akun gratis dulu',
       'pw.firstFine': 'Premium terhubung ke akun Anda, jadi berlaku di semua perangkat tempat Anda masuk.',
       'pw.soon': 'Pembayaran online segera dibuka.',
+      'up.h.vocab': 'Anda sudah menyelesaikan unit kosakata gratis',
+      'up.h.grammar': 'Anda sudah menyelesaikan unit tata bahasa gratis',
+      'up.p': 'Premium membuka unit kosakata {a}–{v}, unit tata bahasa {ga}–{g}, serta semua latihan menyimak dan membaca.',
+      'up.save': 'Simpan kemajuan — akun gratis',
+      'up.buy': 'Buka semuanya — Premium $29.99 sekali bayar',
+      'up.guest': 'Membayar tanpa akun? Daftar nanti dengan email yang Anda pakai untuk membayar, dan Premium terbuka otomatis.',
+      'up.close': 'Tutup',
+      'mk.h': 'Ingin semua unit sebelum ujian?',
+      'mk.p': 'Premium membuka semua 1.000 kata, semua tata bahasa, menyimak dan membaca — $29.99, sekali bayar.',
+      'legal.link': 'Informasi hukum (特定商取引法に基づく表記)',
       'pw.continue': 'Lanjut — {plan}, {price}',
       'pw.stripe': 'Pembayaran aman lewat Stripe. Sekali bayar — tidak diperpanjang, tidak perlu dibatalkan.',
       'ck.login': 'Pembayaran diterima — masuk ke akun yang dipakai untuk membayar agar Premium aktif.',
@@ -481,6 +511,11 @@
   let lang = 'en';
   try { lang = localStorage.getItem(LKEY) || ''; } catch (e) { lang = ''; }
   if (!STR[lang]) { lang = detect(); try { localStorage.setItem(LKEY, lang); } catch (e) {} }
+  // Deep link: ?lang=en|vi|id on load sets the UI language (same as the in-app switcher). Other values are ignored.
+  try {
+    const q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase();
+    if (q && Object.prototype.hasOwnProperty.call(STR, q)) { lang = q; localStorage.setItem(LKEY, q); }
+  } catch (e) {}
 
   N3.lang = () => lang;
   N3.locale = () => LOCALE[lang] || 'en-US';

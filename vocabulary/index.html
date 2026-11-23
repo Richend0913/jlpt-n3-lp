@@ -54,7 +54,7 @@
 
   <div class="trybox">
     <a class="trybtn" href="https://n3.mimoria.jp/app/">Open the web app — start free</a>
-    <p>The web app has the full 1,000-word list with native audio, example sentences, quizzes and spaced repetition. You can start for free; Premium unlocks everything. It runs in your browser with nothing to install.</p>
+    <p>The web app has the full 1,000-word list with standard Japanese audio, example sentences, quizzes and spaced repetition. You can start for free; Premium unlocks everything. It runs in your browser with nothing to install.</p>
   </div>
 
   <section>
@@ -280,7 +280,7 @@
   </footer>
 </div>
 <script data-pv-beacon>
-(function(){try{if(location.hostname!=='n3.mimoria.jp')return;var q=new URLSearchParams(location.search),b=new URLSearchParams({p:'vocabulary',r:q.get('ref')||''}),u='https://jlpt-account.burningbros.workers.dev/hit';if(!(navigator.sendBeacon&&navigator.sendBeacon(u,b)))fetch(u,{method:'POST',body:b,keepalive:true,mode:'no-cors'}).catch(function(){});}catch(e){}})();
+(function(){try{var q=new URLSearchParams(location.search);if(q.get('notrack')==='1')try{localStorage.setItem('n3_no_track','1')}catch(e){}try{if(localStorage.getItem('n3_no_track')==='1')return}catch(e){}if(location.hostname!=='n3.mimoria.jp')return;var b=new URLSearchParams({p:'vocabulary',r:q.get('ref')||''}),u='https://jlpt-account.burningbros.workers.dev/hit';if(!(navigator.sendBeacon&&navigator.sendBeacon(u,b)))fetch(u,{method:'POST',body:b,keepalive:true,mode:'no-cors'}).catch(function(){});}catch(e){}})();
 </script>
 </body>
 </html>

@@ -438,3 +438,11 @@ html[lang="vi"] .ap .h, html[lang="vi"] .del-confirm .h, html[lang="vi"] .pw h1 
 .inst .how { margin-top: 4px; font-size: 13px; color: var(--ink-80); line-height: 1.6; }
 .inst .btn { margin-top: 10px; padding: 9px 12px; font-size: 14px; }
 .inst .x { flex: none; margin: -8px 0 0; }
+/* Premium conversion card (session end of the last free unit, mock-test result) */
+.ap.up { position: relative; }
+.ap.up .x { position: absolute; top: 6px; right: 6px; }
+.ap.up#unlock-prompt .h { padding-right: 36px; }
+.ap.up .up-btns { flex-direction: column; gap: 8px; }
+.ap.up .up-btns .btn { width: 100%; text-align: center; }
+.ap.up .fine { margin-top: 10px; font-size: 12.5px; }
+a.legal { color: var(--ink-80); text-decoration: underline; text-underline-offset: 2px; }

@@ -179,7 +179,7 @@
     </ul>
     <div class="trybox">
       <a class="trybtn" href="https://n3.mimoria.jp/app/">Try N3 Tango free</a>
-      <p>If you want help with the vocabulary, N3 Tango is a web app you can start for free, with 1,000 N3 words, native audio, quizzes and spaced repetition. A countdown to the next exam helps you keep your pace. You can also browse the <a href="/vocabulary/">first 200 words</a> first.</p>
+      <p>If you want help with the vocabulary, N3 Tango is a web app you can start for free, with 1,000 N3 words, standard Japanese audio, quizzes and spaced repetition. A countdown to the next exam helps you keep your pace. You can also browse the <a href="/vocabulary/">first 200 words</a> first.</p>
     </div>
   </section>
 
@@ -228,7 +228,7 @@
   </footer>
 </div>
 <script data-pv-beacon>
-(function(){try{if(location.hostname!=='n3.mimoria.jp')return;var q=new URLSearchParams(location.search),b=new URLSearchParams({p:'guide',r:q.get('ref')||''}),u='https://jlpt-account.burningbros.workers.dev/hit';if(!(navigator.sendBeacon&&navigator.sendBeacon(u,b)))fetch(u,{method:'POST',body:b,keepalive:true,mode:'no-cors'}).catch(function(){});}catch(e){}})();
+(function(){try{var q=new URLSearchParams(location.search);if(q.get('notrack')==='1')try{localStorage.setItem('n3_no_track','1')}catch(e){}try{if(localStorage.getItem('n3_no_track')==='1')return}catch(e){}if(location.hostname!=='n3.mimoria.jp')return;var b=new URLSearchParams({p:'guide',r:q.get('ref')||''}),u='https://jlpt-account.burningbros.workers.dev/hit';if(!(navigator.sendBeacon&&navigator.sendBeacon(u,b)))fetch(u,{method:'POST',body:b,keepalive:true,mode:'no-cors'}).catch(function(){});}catch(e){}})();
 </script>
 </body>
 </html>
