@@ -13,9 +13,11 @@
 
   const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   N3.monthName = k => MONTHS[N3.parseKey(k).getMonth()];
-  N3.fmtExamDate = k => N3.parseKey(k).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  N3.fmtLongDate = k => N3.parseKey(k).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-  N3.fmtShortDate = k => N3.parseKey(k).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  // Dates follow the UI language (js/i18n.js sets N3.locale; en-US until it loads).
+  const loc = () => (typeof N3.locale === 'function' ? N3.locale() : 'en-US');
+  N3.fmtExamDate = k => N3.parseKey(k).toLocaleDateString(loc(), { month: 'short', day: 'numeric', year: 'numeric' });
+  N3.fmtLongDate = k => N3.parseKey(k).toLocaleDateString(loc(), { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  N3.fmtShortDate = k => N3.parseKey(k).toLocaleDateString(loc(), { weekday: 'short', month: 'short', day: 'numeric' });
 
   N3.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 

@@ -40,11 +40,11 @@
     const vNew = Math.min(N3.newLeftToday(), N3.newWords().length);
     if (vDue + vNew > 0 || done.has('vocab')) {
       const parts = [];
-      if (vNew) parts.push(N3.plural(vNew, 'new word'));
-      if (vDue) parts.push(N3.plural(vDue, 'review'));
+      if (vNew) parts.push(N3.tn('plan.newWords', vNew));
+      if (vDue) parts.push(N3.tn('plan.reviews', vDue));
       const fin = done.has('vocab');
-      steps.push({ key: 'vocab', title: 'Vocabulary', jp: '語彙',
-        detail: fin ? `${N3.plural(d.newCount, 'new word')} · ${N3.plural(d.reviewCount, 'review')} done` : parts.join(' · '),
+      steps.push({ key: 'vocab', title: N3.t('plan.vocab'), jp: '語彙',
+        detail: fin ? N3.t('plan.isDone', { x: `${N3.tn('plan.newWords', d.newCount)} · ${N3.tn('plan.reviews', d.reviewCount)}` }) : parts.join(' · '),
         min: Math.ceil(vNew * N3.MIN_PER.newWord + vDue * N3.MIN_PER.reviewWord), n: vNew + vDue, done: fin });
     }
     // grammar
@@ -52,22 +52,22 @@
     const gNew = Math.min(N3.newGrammarLeftToday(), N3.newGrammar().length);
     if (gDue + gNew > 0 || done.has('grammar')) {
       const parts = [];
-      if (gNew) parts.push(N3.plural(gNew, 'new pattern'));
-      if (gDue) parts.push(N3.plural(gDue, 'review'));
+      if (gNew) parts.push(N3.tn('plan.newPatterns', gNew));
+      if (gDue) parts.push(N3.tn('plan.reviews', gDue));
       const fin = done.has('grammar');
-      steps.push({ key: 'grammar', title: 'Grammar', jp: '文法',
-        detail: fin ? `${N3.plural(d.gNew, 'new pattern')} · ${N3.plural(d.gReview, 'review')} done` : parts.join(' · '),
+      steps.push({ key: 'grammar', title: N3.t('plan.grammar'), jp: '文法',
+        detail: fin ? N3.t('plan.isDone', { x: `${N3.tn('plan.newPatterns', d.gNew)} · ${N3.tn('plan.reviews', d.gReview)}` }) : parts.join(' · '),
         min: Math.ceil(gNew * N3.MIN_PER.newGrammar + gDue * N3.MIN_PER.reviewGrammar), n: gNew + gDue, done: fin });
     }
     // listening or reading
     const kind = practiceKind();
     if (kind === 'listen' && N3.openListening().length) {
       const n = Math.min(N3.PLAN_LISTEN, N3.openListening().length);
-      steps.push({ key: 'listen', title: 'Listening', jp: '聴解', detail: done.has('listen') ? `${N3.plural(n, 'conversation')} done` : `${N3.plural(n, 'conversation')} with questions`,
+      steps.push({ key: 'listen', title: N3.t('plan.listen'), jp: '聴解', detail: N3.t(done.has('listen') ? 'plan.isDone' : 'plan.withQ', { x: N3.tn('plan.convs', n) }),
         min: Math.ceil(n * N3.MIN_PER.listen), n, done: done.has('listen') });
     } else if (kind === 'read' && N3.openReading().length) {
       const p = N3.nextReading();
-      steps.push({ key: 'read', title: 'Reading', jp: '読解', detail: p ? `1 passage, ${p.chars} characters · ${N3.plural(p.questions.length, 'question')}` : '1 passage',
+      steps.push({ key: 'read', title: N3.t('plan.read'), jp: '読解', detail: p ? N3.t('plan.passage', { c: p.chars, q: N3.tn('plan.questions', p.questions.length) }) : N3.t('plan.passage1'),
         min: Math.ceil(N3.MIN_PER.read), n: 1, done: done.has('read') });
     }
     const left = steps.filter(s => !s.done);

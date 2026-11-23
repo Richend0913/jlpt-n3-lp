@@ -22,6 +22,7 @@
   --sans: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
   --mincho: "Shippori Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --sans-ja: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
   --side: 24px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -37,7 +38,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 button:disabled { cursor: default; }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
-[lang="ja"], .ja { font-family: var(--sans); }
+[lang="ja"], .ja { font-family: var(--sans-ja); }
 .num, .mono { font-family: var(--mono); font-weight: 500; font-variant-numeric: tabular-nums; }
 .muted { color: var(--mute); }
 .ic { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; vertical-align: middle; }
@@ -114,7 +115,7 @@ hr.div { border: none; border-top: 1px solid var(--rule); margin-top: 30px; }
 .entry .no, .card .no { font-family: var(--mono); font-size: 12px; color: var(--mute); }
 .entry .no .pos, .card .no .pos { font-family: var(--sans); margin-left: 8px; }
 .word { margin-top: 6px; font-family: var(--mincho); font-weight: 700; font-size: 42px; line-height: 1.3; }
-.word rt { font-family: var(--sans); font-size: 12.5px; font-weight: 500; color: var(--furi); }
+.word rt { font-family: var(--sans-ja); font-size: 12.5px; font-weight: 500; color: var(--furi); }
 .mean { margin-top: 8px; font-size: 15.5px; color: var(--or-t); font-weight: 500; }
 .ex { margin-top: 14px; font-size: 14.5px; line-height: 1.9; color: var(--ink-90); }
 .ex .en { display: block; font-size: 13px; color: var(--mute); margin-top: 2px; line-height: 1.6; }
@@ -166,7 +167,7 @@ rt { font-size: .55em; color: var(--furi); font-weight: 500; }
 .tagl.again { border: 1px solid var(--ink); line-height: 17px; }
 .card .word { font-size: 40px; margin-top: 4px; }
 .card .pat { font-family: var(--mincho); font-weight: 700; font-size: 30px; line-height: 1.35; margin-top: 6px; }
-.card .form { margin-top: 8px; font-size: 13px; color: var(--ink-80); font-family: var(--sans); line-height: 1.6; }
+.card .form { margin-top: 8px; font-size: 13px; color: var(--ink-80); font-family: var(--sans-ja); line-height: 1.6; }
 .card .form b { font-weight: 500; color: var(--mute); margin-right: 6px; }
 .card .ex { font-size: 15px; }
 .card .exs { margin-top: 6px; }
@@ -391,3 +392,49 @@ a.btn { text-decoration: none; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 @media (prefers-reduced-motion: reduce) { .toast, .zone.open .sheet { transition: none; } }
 .free-bar { margin-top: 12px; padding: 8px 12px; border: 1px solid var(--rule); border-left: 3px solid var(--or); border-radius: 4px; font-size: 12.5px; color: var(--ink); font-weight: 600; line-height: 1.6; }
+
+/* ---------- UI language (js/i18n.js) ----------
+   The self-hosted Zen Kaku Gothic / Shippori subsets have no Vietnamese glyphs (ạ ế ữ …): per-glyph fallback
+   would mix two fonts inside one word. Vietnamese UI text uses the system sans; Japanese keeps --sans-ja. */
+html[lang="vi"] { --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif; }
+html[lang="vi"] .ap .h, html[lang="vi"] .del-confirm .h, html[lang="vi"] .pw h1 { font-family: var(--sans); }
+.lang-pick { position: relative; display: inline-flex; align-items: center; height: 38px; padding: 0 6px; font-family: var(--mono); font-size: 12.5px; font-weight: 500; color: var(--mute); cursor: pointer; }
+.lang-pick span::after { content: "▾"; margin-left: 3px; font-size: 10.5px; }
+.lang-pick select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 16px; }
+.lang-pick:focus-within { outline: 2px solid var(--ai); outline-offset: 2px; border-radius: 4px; }
+
+/* ---------- Home hero: exam countdown, main actions, progress strip ---------- */
+.hero { margin-top: 18px; }
+.hero .cd { display: flex; align-items: baseline; gap: 10px; }
+.hero .cd b { font-family: var(--mono); font-weight: 500; font-size: 52px; line-height: 1; color: var(--ink); letter-spacing: -.02em; }
+.hero .cd span { font-size: 18px; font-weight: 700; }
+.hero .until { margin-top: 6px; font-size: 13px; color: var(--mute); }
+.hero .cd-today { font-size: 18px; font-weight: 700; color: var(--or-t); }
+.hero .sw { display: block; font-size: 13px; padding: 4px 0 0; text-decoration: underline; text-underline-offset: 2px; }
+.hero .ctas { margin-top: 18px; }
+.hero .cta-sub { margin: 6px 0 12px; font-size: 12px; color: var(--mute); text-align: center; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 18px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.stats > div { padding: 10px 4px; text-align: center; }
+.stats > div + div { border-left: 1px solid var(--rule); }
+.stats b { display: block; font-size: 20px; line-height: 1.3; color: var(--ink); }
+.stats b small { font-size: 12px; color: var(--mute); }
+.stats b i { font-style: normal; font-size: 12px; margin-left: 4px; }
+.stats b i.up { color: var(--ai); }
+.stats b i.dn { color: var(--or-t); }
+.stats span { display: block; margin-top: 2px; font-size: 12px; line-height: 1.4; color: var(--mute); }
+
+/* After a mock test: weakest section card */
+.fix { margin-top: 22px; padding: 16px; border: 1px solid var(--ink); border-radius: 6px; background: var(--card); }
+.fix .h { font-size: 16px; font-weight: 700; line-height: 1.45; }
+.fix p { margin-top: 6px; font-size: 13.5px; color: var(--ink-80); line-height: 1.65; }
+.fix .meter { margin: 12px 0 26px; }
+.fix .btn small { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; opacity: .85; }
+
+/* Add to Home Screen card */
+.inst { margin-top: 22px; display: flex; gap: 12px; align-items: flex-start; padding: 14px 6px 14px 14px; border: 1px solid var(--rule); border-left: 3px solid var(--ai); border-radius: 6px; background: var(--card); }
+.inst img { flex: none; border-radius: 8px; border: 1px solid var(--rule); }
+.inst .b { flex: 1; min-width: 0; }
+.inst .h { font-size: 14px; font-weight: 700; line-height: 1.5; }
+.inst .how { margin-top: 4px; font-size: 13px; color: var(--ink-80); line-height: 1.6; }
+.inst .btn { margin-top: 10px; padding: 9px 12px; font-size: 14px; }
+.inst .x { flex: none; margin: -8px 0 0; }

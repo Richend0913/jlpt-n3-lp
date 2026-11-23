@@ -35,25 +35,20 @@
   const splitChoice = c => { const m = /^(.*?)\s*\(([^()]*)\)\s*$/.exec(c); return m && /[぀-ヿ一-鿿]/.test(m[1]) ? { ja: m[1], en: m[2] } : { ja: null, en: c }; };
   const unitRangeText = () => (N3.FREE_UNITS === 1 ? 'Unit 1' : `Units 1–${N3.FREE_UNITS}`);
   const isJa = s => /[぀-ヿ一-鿿]/.test(s);
+  const t = N3.t, tn = N3.tn;   // UI strings (js/i18n.js)
+  const unitRangeT = () => (N3.FREE_UNITS === 1 ? t('pw.unit1') : t('pw.units', { n: N3.FREE_UNITS }));
 
   function hd(title, opts = {}) {
-    const left = opts.back ? `<button class="icon-btn l" data-act="back" aria-label="Back">${I('back')}</button>` : '';
+    const left = opts.back ? `<button class="icon-btn l" data-act="back" aria-label="${esc(t('aria.back'))}">${I('back')}</button>` : '';
     const right = opts.right || '';
     return `<div class="hd"><div class="ttl">${left}<h1>${title}</h1></div>${right ? `<div class="right">${right}</div>` : ''}</div>`;
   }
   const secHead = (title, jp, aside) => `<div class="rule"></div><h2>${title}${jp ? `<span class="jp" lang="ja">${jp}</span>` : ''}${aside ? `<span class="aside">${aside}</span>` : ''}</h2>`;
-  const gearBtn = () => `<button class="icon-btn" data-go="#/settings" aria-label="Settings">${I('gear')}</button>`;
+  const gearBtn = () => `<button class="icon-btn" data-go="#/settings" aria-label="${esc(t('aria.settings'))}">${I('gear')}</button>`;
 
+  // Today's date under the logo (the exam countdown lives in the Home hero).
   function dateLine() {
-    const t = N3.today();
-    const exam = N3.examDate();
-    const n = N3.daysBetween(t, exam);
-    const mon = N3.monthName(exam);
-    let s = `<b>${esc(N3.fmtShortDate(t))}</b> — `;
-    s += n > 0 ? `<b>${N3.num(n)}</b> ${n === 1 ? 'day' : 'days'} to the ${mon} exam` : n === 0 ? `The ${mon} exam is today` : 'Set your exam date in Settings';
-    const st = N3.currentStreak();
-    if (st > 0) s += ` · <b>${st}</b>-day streak`;
-    return `<div class="date">${s}</div>`;
+    return `<div class="date"><b>${esc(N3.fmtShortDate(N3.today()))}</b></div>`;
   }
 
   // ---------- audio (relative paths so file:// works; a missing file fails silently) ----------
@@ -102,7 +97,7 @@
     return p.steps.map(s => `<button class="row${s.done ? ' done' : ''}" data-act="planStep" data-arg="${s.key}">
       <span class="k" lang="ja">${s.jp[0]}</span>
       <span class="t"><span>${esc(s.title)}</span><span class="sub">${esc(s.detail)}</span></span>
-      ${s.done ? '<span class="stamp sm" lang="ja" aria-label="Done">済</span>' : `<span class="min">${s.min} min</span>`}
+      ${s.done ? `<span class="stamp sm" lang="ja" aria-label="${esc(t('done'))}">済</span>` : `<span class="min">${esc(t('min', { n: s.min }))}</span>`}
     </button>`).join('');
   }
   // "Next step" block shown on a finished step while a plan run is going.
@@ -110,8 +105,8 @@
     if (!ui.planRun) return fallback;
     const p = N3.todayPlan();
     const s = p.left[0];
-    if (!s) { ui.planRun = false; return `<p class="lede">Today's plan is done: ${plural(p.steps.length, 'step')}.</p><div class="btns"><button class="btn primary" data-act="home">Back to Home</button></div>`; }
-    return `<div class="btns" style="flex-direction:column"><button class="btn primary" data-act="planStart">Next: ${esc(s.title)} · about ${s.min} min</button><button class="btn" data-act="home">Back to Home</button></div>`;
+    if (!s) { ui.planRun = false; return `<p class="lede">${tn('today.alldone', p.steps.length)}</p><div class="btns"><button class="btn primary" data-act="home">${esc(t('plan.back'))}</button></div>`; }
+    return `<div class="btns" style="flex-direction:column"><button class="btn primary" data-act="planStart">${esc(t('plan.next', { title: s.title, n: s.min }))}</button><button class="btn" data-act="home">${esc(t('plan.back'))}</button></div>`;
   }
   // ---------- Early account prompt (guests only) ----------
   // Progress of a guest lives only in this browser's storage (it is uploaded on first signup), so after the
@@ -134,12 +129,12 @@
       ui.apRun = run; ap.shown = true; apSave();
     }
     return `<div class="ap" id="acct-prompt" role="region" aria-labelledby="ap-h">
-  <div class="h" id="ap-h">Keep your progress safe</div>
-  <p>Your progress is saved only on this device. Create a free account and it follows you when you change phones.</p>
-  <div class="btns"><button class="btn" data-act="apLater">Later</button><button class="btn primary" data-act="apCreate">Create free account</button></div>
+  <div class="h" id="ap-h">${esc(t('ap.h'))}</div>
+  <p>${esc(t('ap.p'))}</p>
+  <div class="btns"><button class="btn" data-act="apLater">${esc(t('ap.later'))}</button><button class="btn primary" data-act="apCreate">${esc(t('ap.create'))}</button></div>
 </div>`;
   }
-  const acctBanner = () => (hasAccount() ? '' : `<p class="ap-bar" id="acct-banner">Your progress is saved only on this device. <button class="txtbtn" data-act="accountFirst">Create a free account</button></p>`);
+  const acctBanner = () => (hasAccount() ? '' : `<p class="ap-bar" id="acct-banner">${esc(t('acct.banner'))} <button class="txtbtn" data-act="accountFirst">${esc(t('acct.createFree'))}</button></p>`);
 
   function startStep(key) {
     if (key === 'vocab') return startSession('vocab', 'today');
@@ -150,35 +145,125 @@
   }
 
   // ---------- Home ----------
+  // Has this device studied anything yet? (stats strip and install card wait for the first real use)
+  const hasStudied = () => Object.keys(S().srs).length > 0 || S().stats.mock.length > 0 ||
+    Object.values(S().days).some(d => d.answers || d.newCount || d.reviewCount);
+  const mocksV2 = () => S().stats.mock.filter(m => m.v === 2);
+
+  // Language picker: a real <select> under a short "EN / VI / ID" label.
+  function langPick() {
+    const cur = N3.LANGS.find(l => l[0] === N3.lang()) || N3.LANGS[0];
+    return `<label class="lang-pick" title="${esc(t('lang.label'))}"><span aria-hidden="true">${esc(cur[2])}</span><select data-lang aria-label="${esc(t('lang.label'))}">${N3.LANGS.map(([c, name]) => `<option value="${c}"${c === cur[0] ? ' selected' : ''}>${esc(name)}</option>`).join('')}</select></label>`;
+  }
+
+  // Hero: exam countdown + the two main actions. Before the first mock test the mock is the primary action
+  // (the sharpest hook, especially while everything is free); after it, today's plan leads.
+  function heroHtml(p) {
+    const today = N3.today();
+    const exam = N3.examDate();
+    const n = N3.daysBetween(today, exam);
+    const next = N3.EXAM_DATES.find(d => d >= today);
+    let cd;
+    if (n > 0) cd = `<div class="cd"><b class="num" id="cd-days">${N3.num(n)}</b><span>${esc(tn('hero.days', n))}</span></div><p class="until">${esc(t('hero.until', { date: N3.fmtExamDate(exam) }))}</p>`;
+    else if (n === 0) cd = `<p class="cd-today">${esc(t('hero.today'))}</p>`;
+    else cd = `<p class="until">${esc(t('hero.noexam'))}</p>`;
+    // The default exam date is the July one: offer the nearer sitting in one tap.
+    const sw = next && next !== exam ? `<button class="txtbtn sw" data-act="exam" data-arg="${next}" id="cd-switch">${esc(t('hero.switch', { date: N3.fmtExamDate(next) }))}</button>` : '';
+    const mocks = mocksV2();
+    const mockBtn = cls => `<button class="btn${cls}" data-go="#/mock" id="cta-mock">${esc(!mocks.length ? (freeNow() ? t('hero.mock_free') : t('hero.mock')) : t('hero.mock_again'))}</button>`;
+    const planOpen = p.steps.length > 0 && !p.allDone;
+    const planBtn = cls => (planOpen
+      ? `<button class="btn${cls}" data-act="planStart" id="cta-plan">${esc(p.steps.some(s => s.done) ? t('hero.continue') : t('hero.start'))}</button>`
+      : `<button class="btn${cls}" data-act="quizFrom" data-arg="mixed" id="cta-plan">${esc(t('hero.plan_done'))}</button>`);
+    const ctas = !mocks.length
+      ? `${mockBtn(' primary')}<p class="cta-sub">${esc(t('hero.mock_sub', { n: mockMinutes() }))}</p>${planBtn('')}`
+      : `${planBtn(' primary')}${mockBtn('')}`;
+    return `<div class="hero" id="hero">${cd}${sw}<div class="ctas">${ctas}</div>${statsHtml(mocks)}</div>`;
+  }
+
+  // Progress at a glance: streak, words mastered, last mock score with the change from the one before.
+  function statsHtml(mocks) {
+    if (!hasStudied()) return '';
+    const streak = N3.currentStreak();
+    const mast = N3.WORDS.reduce((a, w) => a + (N3.isMastered(w.id) ? 1 : 0), 0);
+    let mv = '—', trend = '';
+    if (mocks.length) {
+      const cur = N3.judge(mocks[mocks.length - 1]).total;
+      mv = `${cur}<small>/180</small>`;
+      if (mocks.length > 1) {
+        const d = cur - N3.judge(mocks[mocks.length - 2]).total;
+        if (d) trend = `<i class="${d > 0 ? 'up' : 'dn'}">${d > 0 ? '+' : '−'}${Math.abs(d)}</i>`;
+      }
+    }
+    return `<div class="stats" id="home-stats">
+  <div><b class="num">${streak}</b><span>${esc(tn('stat.streak', streak))}</span></div>
+  <div><b class="num">${N3.num(mast)}</b><span>${esc(tn('stat.mastered', mast))}</span></div>
+  <div><b class="num">${mv}${trend}</b><span>${esc(mocks.length ? t('stat.mock') : t('stat.mock_none'))}</span></div>
+</div>`;
+  }
+
+  // After a mock test: the weakest section of the latest one, with a one-tap way into matching practice.
+  function fixCard() {
+    const mocks = mocksV2();
+    if (!mocks.length) return '';
+    const last = mocks[mocks.length - 1];
+    const j = N3.judge(last);
+    const k = N3.SEC_KEYS.reduce((a, x) => (j.scores[x] < j.scores[a] ? x : a));
+    const sc = j.scores[k];
+    if (sc >= N3.SEC_MAX) return '';
+    return `<div class="fix" id="fix-card" data-sec="${k}">
+  <div class="h">${esc(t('fix.h', { sec: t('sec.' + k) }))}</div>
+  <p>${esc(t(sc < N3.SEC_CUTOFF ? 'fix.p' : 'fix.p_ok', { score: sc, date: N3.fmtShortDate(last.date) }))}</p>
+  ${meter(sc, 60, N3.SEC_CUTOFF)}
+  <button class="btn ai" data-act="fixSec" data-arg="${k}" id="fix-btn">${esc(t('fix.btn'))}<small>${esc(t('fix.sub.' + k))}</small></button>
+</div>`;
+  }
+
+  // "Add to Home Screen" card (js/install.js decides whether and how; dismissal is remembered).
+  function installCard() {
+    if (!N3.install || !hasStudied()) return '';
+    const mode = N3.install.mode();
+    if (!mode) return '';
+    const how = mode === 'prompt'
+      ? `<button class="btn" data-act="install" id="install-btn">${esc(t('inst.btn'))}</button>`
+      : `<p class="how">${esc(t(mode === 'ios' ? 'inst.ios' : 'inst.other'))}</p>`;
+    return `<div class="inst" id="install-card" data-mode="${mode}">
+  <img src="icons/icon-192.png" alt="" width="44" height="44">
+  <div class="b"><div class="h">${esc(t('inst.h'))}</div>${how}</div>
+  <button class="icon-btn x" data-act="installDismiss" aria-label="${esc(t('inst.close'))}">${I('close')}</button>
+</div>`;
+  }
+
   function viewHome() {
     const p = N3.todayPlan();
     const dueW = N3.dueWords().length, dueG = N3.dueGrammar().length;
     const w = N3.wordOfDay();
     let today;
     if (!p.steps.length) {
-      today = `<p class="todayline">Nothing is scheduled: no reviews are due and every open item has been studied.</p>`;
+      today = `<p class="todayline">${esc(t('today.nothing'))}</p>`;
     } else {
-      const left = p.left;
+      const unit = { vocab: 'u.word', grammar: 'u.pattern', listen: 'u.conversation', read: 'u.passage' };
       const summary = p.allDone
-        ? `All <b>${p.steps.length}</b> steps done for today.`
-        : `${left.map(s => `<b>${s.n}</b> ${esc(s.key === 'vocab' ? (s.n === 1 ? 'word' : 'words') : s.key === 'grammar' ? (s.n === 1 ? 'pattern' : 'patterns') : s.key === 'listen' ? (s.n === 1 ? 'conversation' : 'conversations') : 'passage')}`).join(' · ')} · about <b>${p.totalMin}</b> minutes`;
-      const started = p.steps.some(s => s.done);
+        ? tn('today.alldone', p.steps.length)
+        : `${p.left.map(s => `<b>${s.n}</b> ${esc(tn(unit[s.key], s.n))}`).join(' · ')} · ${t('today.about', { n: p.totalMin })}`;
       today = `<p class="todayline">${summary}</p>
-        <div class="rows plan">${planLines(p)}</div>
-        ${p.allDone ? '' : `<button class="btn primary start" data-act="planStart">${started ? `Continue: ${esc(left[0].title)}` : "Start today's plan"}</button>`}`;
+        <div class="rows plan">${planLines(p)}</div>`;
     }
     const revParts = [];
-    if (dueW) revParts.push(plural(dueW, 'word'));
-    if (dueG) revParts.push(plural(dueG, 'pattern'));
+    if (dueW) revParts.push(`${dueW} ${tn('u.word', dueW)}`);
+    if (dueG) revParts.push(`${dueG} ${tn('u.pattern', dueG)}`);
     return `
-<div class="hd"><div class="logo">N3 <span>Tango</span></div><div class="right">${gearBtn()}</div></div>
+<div class="hd"><div class="logo">N3 <span>Tango</span></div><div class="right">${langPick()}${gearBtn()}</div></div>
 ${dateLine()}
 ${freeBanner()}
-${acctBanner()}
-<div class="sec">${secHead('Today')}
+${heroHtml(p)}
+${fixCard()}
+<div class="sec">${secHead(esc(t('home.today')))}
   ${today}
-  <p class="rev">Reviews due: <span class="ind">${revParts.length ? esc(revParts.join(' · ')) : 'none'}</span></p>
+  <p class="rev">${esc(t('today.reviews'))} <span class="ind">${esc(revParts.length ? revParts.join(' · ') : t('today.none'))}</span></p>
 </div>
+${installCard()}
+${acctBanner()}
 <hr class="div">
 ${w ? `<div class="entry">
   <div class="no">No. ${no4(w._i + 1)}<span class="pos">${esc(N3.POS_LABEL[w.pos] || w.pos || '')}</span></div>
@@ -187,18 +272,17 @@ ${w ? `<div class="entry">
   ${w.example ? `<p class="ex" lang="ja">${N3.exampleHtml(w)}<span class="en" lang="en">${esc(w.example_translation || '')}</span></p>` : ''}
 </div>` : ''}
 <div class="rows" style="margin-top:30px">
-  <a class="row" href="#/quiz"><span class="t">Quiz<span class="sub">Words and grammar, 10 questions</span></span><span class="arr">${I('next')}</span></a>
-  <a class="row" href="#/mock"><span class="t">Mock test<span class="sub">3 sections like the real N3, about ${mockMinutes()} minutes</span></span><span class="arr">${I('next')}</span></a>
-  <a class="row" href="#/progress"><span class="t">Progress<span class="sub">Section estimates against the 19-point cutoff</span></span><span class="arr">${I('next')}</span></a>
+  <a class="row" href="#/quiz"><span class="t">${esc(t('row.quiz'))}<span class="sub">${esc(t('row.quiz.sub'))}</span></span><span class="arr">${I('next')}</span></a>
+  <a class="row" href="#/mock"><span class="t">${esc(t('row.mock'))}<span class="sub">${esc(t('row.mock.sub', { n: mockMinutes() }))}</span></span><span class="arr">${I('next')}</span></a>
+  <a class="row" href="#/progress"><span class="t">${esc(t('row.progress'))}<span class="sub">${esc(t('row.progress.sub'))}</span></span><span class="arr">${I('next')}</span></a>
 </div>`;
   }
 
   // Shown outside the paywall (Settings row, locked dividers); the plan cards carry the full prices.
   const PRICE_MO = '$12.99/mo', PRICE_YR = '$59.99/yr';
   // Free period (N3.FREE_UNTIL in store.js): one message replaces every upgrade prompt until it ends.
-  const FREE_MSG = 'Everything is free until Dec 6 — good luck on the exam!';
   const freeNow = () => N3.isFreePeriod();
-  const freeBanner = () => (freeNow() ? `<p class="free-bar" id="free-banner">${esc(FREE_MSG)}</p>` : '');
+  const freeBanner = () => (freeNow() ? `<p class="free-bar" id="free-banner">${esc(t('free.msg'))}</p>` : '');
 
   // ---------- Learn: two tracks ----------
   function vocabToc() {
@@ -261,7 +345,7 @@ ${w ? `<div class="entry">
       body = `<p class="sess">Today — <b>${due}</b> ${due === 1 ? 'review' : 'reviews'} due · <b>${newLeft}</b> new ${newLeft === 1 ? 'pattern' : 'patterns'}</p>${act}${grammarToc()}`;
     }
     return `
-${hd('Learn', { right: `<b class="num">${N3.num(N3.WORDS.length)}</b> words · <b class="num">${N3.GRAMMAR.length}</b> patterns` })}
+${hd(esc(t('nav.learn')), { right: `<b class="num">${N3.num(N3.WORDS.length)}</b> words · <b class="num">${N3.GRAMMAR.length}</b> patterns` })}
 ${tabs}
 ${body}
 ${N3.META.source === 'sample' ? '<p class="fine">Sample word list (development build).</p>' : ''}`;
@@ -478,7 +562,7 @@ ${(p.paras || []).map((t, i) => `<p class="${i === 0 && p.paras.length > 1 && t.
     const last = st.mock.filter(m => m.v === 2).slice(-1)[0];
     const lastTxt = last ? (() => { const j = N3.judge(last); return `Last: ${j.total} / 180 on ${N3.fmtShortDate(last.date)}`; })() : `3 sections, about ${mockMinutes()} minutes`;
     return `
-${hd('Practice', { right: gearBtn() })}
+${hd(esc(t('nav.practice')), { right: gearBtn() })}
 <div class="sec">${secHead('Drills', '練習')}
 <div class="rows">
   <a class="row" href="#/quiz"><span class="k" lang="ja">問</span><span class="t">Quiz<span class="sub">Vocabulary 4-choice, grammar fill-in and sentence order</span></span><span class="arr">${I('next')}</span></a>
@@ -677,32 +761,31 @@ ${planNext(`<div class="btns"><button class="btn" data-go="#/reading">All passag
       const rq = N3.openReading().slice(0, P.passages).reduce((a, p) => a + p.questions.length, 0);
       const counts = [P.reading + P.fill + P.meaning, P.gfill + P.gstar + rq, P.listen];
       return `
-${hd('Mock test', { back: true, right: '<span lang="ja">模試</span>' })}
-<p class="lede">Three parts in the order of the real JLPT N3. Answers are shown at the end. Listening audio plays once.</p>
-<div class="rows">${N3.MOCK_PARTS.map((p, i) => `<div class="row"><span class="k num" style="font-family:var(--mono);font-size:15px">${p.n}</span><span class="t">${esc(p.title)}<span class="sub" lang="ja">${esc(p.jp)}</span></span><span class="v">${counts[i]} Q · ${p.min} min</span></div>`).join('')}</div>
-<div class="sec">${secHead('How it is scored')}
+${hd(esc(t('mock.title')), { back: true, right: '<span lang="ja">模試</span>' })}
+<p class="lede">${esc(t('mock.lede'))}</p>
+<div class="rows">${N3.MOCK_PARTS.map((p, i) => `<div class="row"><span class="k num" style="font-family:var(--mono);font-size:15px">${p.n}</span><span class="t">${esc(t('part.' + p.n))}<span class="sub" lang="ja">${esc(p.jp)}</span></span><span class="v">${esc(t('mock.qmin', { q: counts[i], m: p.min }))}</span></div>`).join('')}</div>
+<div class="sec">${secHead(esc(t('mock.how')))}
 <div class="kvs">
-  ${N3.SEC_KEYS.map(k => `<div class="kv"><span>${esc(N3.SECTIONS[k].name)} <span class="muted" lang="ja" style="font-size:12.5px">${esc(N3.SECTIONS[k].jp)}</span></span><b>0–60</b></div>`).join('')}
-  <div class="kv"><span>Section cutoff</span><b>19 / 60</b></div>
-  <div class="kv"><span>Pass line (total)</span><b>95 / 180</b></div>
+  ${N3.SEC_KEYS.map(k => `<div class="kv"><span>${esc(t('sec.' + k))} <span class="muted" lang="ja" style="font-size:12.5px">${esc(N3.SECTIONS[k].jp)}</span></span><b>0–60</b></div>`).join('')}
+  <div class="kv"><span>${esc(t('mock.cutoff'))}</span><b>19 / 60</b></div>
+  <div class="kv"><span>${esc(t('mock.passline'))}</span><b>95 / 180</b></div>
 </div>
-<p class="note">Scores here are an in-app estimate: each section's share of correct answers is scaled to 0–60. The real JLPT uses scaled scoring, so an official result can differ.</p></div>
-${hist.length ? `<div class="sec">${secHead('Your results')}<div class="kvs">${hist.slice(-3).reverse().map(h => { const j = N3.judge(h); return `<div class="kv"><span>${esc(N3.fmtShortDate(h.date))}</span><b>${j.total} / 180 · ${j.pass ? 'pass level' : 'below'}</b></div>`; }).join('')}</div></div>` : ''}
-<button class="btn primary start" data-act="startMock">Start mock test</button>`;
+<p class="note">${esc(t('mock.note'))}</p></div>
+${hist.length ? `<div class="sec">${secHead(esc(t('mock.yours')))}<div class="kvs">${hist.slice(-3).reverse().map(h => { const j = N3.judge(h); return `<div class="kv"><span>${esc(N3.fmtShortDate(h.date))}</span><b>${j.total} / 180 · ${esc(j.pass ? t('mock.passlevel') : t('mock.below'))}</b></div>`; }).join('')}</div></div>` : ''}
+<button class="btn primary start" data-act="startMock">${esc(t('mock.start'))}</button>`;
     }
     if (m.finished) return mockResults(m);
     const q = m.questions[m.idx];
-    const part = N3.MOCK_PARTS[q.part - 1];
     const insKey = q.kind === 'listen' && q.item.type === 'response' ? 'listenResponse' : q.kind;
     const ins = N3.MOCK_INS[insKey] || ['', ''];
     const last = m.idx + 1 === m.questions.length;
     return `
 ${runTop('exitMock', m.idx + 1, m.questions.length, m.idx)}
-<div class="part">Part <b>${q.part}</b> of 3 · ${esc(part.title)}</div>
-<div class="ins"><span lang="ja">${esc(ins[0])}</span><span class="en">${esc(ins[1])}</span></div>
+<div class="part">${t('mock.part', { n: q.part, title: esc(t('part.' + q.part)) })}</div>
+<div class="ins"><span lang="ja">${esc(ins[0])}</span><span class="en">${ins[1] ? esc(t('ins.' + insKey)) : ''}</span></div>
 <div class="q">${questionBody(q, { mock: true })}</div>
 ${choicesHtml(q, { reveal: false })}
-<div class="btns"><button class="btn primary" data-act="mockNext"${q.picked === null ? ' disabled' : ''}>${last ? 'Finish' : 'Next'}</button></div>`;
+<div class="btns"><button class="btn primary" data-act="mockNext"${q.picked === null ? ' disabled' : ''}>${esc(last ? t('mock.finish') : t('mock.next'))}</button></div>`;
   }
   function finishMock() {
     stopAudio();
@@ -716,31 +799,32 @@ ${choicesHtml(q, { reveal: false })}
     m.finished = true;
   }
   function meter(score, max, cut, cls = '') {
-    return `<div class="meter${cls}${score !== null && score < cut ? ' low' : ''}" role="img" aria-label="${score === null ? 'No estimate' : `${score} of ${max}; cutoff ${cut}`}"><i style="width:${score === null ? 0 : pct(score, max)}%"></i><span class="cut" style="left:${(cut / max) * 100}%"><span>${cut}</span></span></div>`;
+    return `<div class="meter${cls}${score !== null && score < cut ? ' low' : ''}" role="img" aria-label="${score === null ? 'No estimate' : `${score} / ${max}; cutoff ${cut}`}"><i style="width:${score === null ? 0 : pct(score, max)}%"></i><span class="cut" style="left:${(cut / max) * 100}%"><span>${cut}</span></span></div>`;
   }
   function mockResults(m) {
     const j = N3.judge(m.secs);
     const behind = N3.PASS_TOTAL - j.total;
+    const secName = k => t('sec.' + k);
     let verdict;
-    if (j.pass) verdict = `<p class="verdict pass">Pass level: ${j.total} of 180, every section at 19 or above.</p>`;
-    else if (j.below.length) verdict = `<p class="verdict fail">Below the cutoff in ${j.below.map(k => N3.SECTIONS[k].name).join(' and ')}: a section under 19 fails the test even with a high total.</p>`;
-    else verdict = `<p class="verdict fail">${behind} ${behind === 1 ? 'point' : 'points'} below the 95-point pass line.</p>`;
-    const byPart = [1, 2, 3].map(n => `<div class="ph">Part ${n} · ${esc(N3.MOCK_PARTS[n - 1].title)}</div>${m.questions.filter(q => q.part === n).map(reviewRow).join('')}`).join('');
+    if (j.pass) verdict = `<p class="verdict pass">${esc(t('res.pass', { t: j.total }))}</p>`;
+    else if (j.below.length) verdict = `<p class="verdict fail">${esc(t('res.cut', { secs: j.below.map(secName).join(t('and')) }))}</p>`;
+    else verdict = `<p class="verdict fail">${esc(tn('res.behind', behind))}</p>`;
+    const byPart = [1, 2, 3].map(n => `<div class="ph">${esc(t('mock.partShort', { n, title: t('part.' + n) }))}</div>${m.questions.filter(q => q.part === n).map(reviewRow).join('')}`).join('');
     return `
-${hd('Mock test results')}
-<div class="score"><span class="big">${j.total}<small> / 180</small></span><span class="lbl">pass line 95</span></div>
+${hd(esc(t('res.title')))}
+<div class="score"><span class="big">${j.total}<small> / 180</small></span><span class="lbl">${esc(t('res.passline'))}</span></div>
 ${verdict}
 ${acctPrompt(m)}
 <div class="secs">
-${N3.SEC_KEYS.map(k => { const sc = j.scores[k]; const [r, t] = m.secs[k]; return `<div class="secr" data-sec="${k}"><div class="top"><span class="nm">${esc(N3.SECTIONS[k].name)}<small lang="ja">${esc(N3.SECTIONS[k].jp)}</small></span><span class="sc">${sc}<small> / 60</small></span></div>
+${N3.SEC_KEYS.map(k => { const sc = j.scores[k]; const [r, tot] = m.secs[k]; return `<div class="secr" data-sec="${k}"><div class="top"><span class="nm">${esc(secName(k))}<small lang="ja">${esc(N3.SECTIONS[k].jp)}</small></span><span class="sc">${sc}<small> / 60</small></span></div>
   ${meter(sc, 60, N3.SEC_CUTOFF)}
-  <div class="meta"><span>${r} of ${t} correct</span>${sc < N3.SEC_CUTOFF ? `<span class="risk">Below the 19 cutoff</span>` : `<span class="safe">${sc - N3.SEC_CUTOFF} above the cutoff</span>`}</div></div>`; }).join('')}
-<div class="secr tot"><div class="top"><span class="nm">Total</span><span class="sc">${j.total}<small> / 180</small></span></div>${meter(j.total, 180, N3.PASS_TOTAL, ' total')}
-  <div class="meta"><span>Pass line 95 and 19 in every section</span>${j.pass ? '<span class="safe">Pass level</span>' : '<span class="risk">Below pass level</span>'}</div></div>
+  <div class="meta"><span>${esc(t('res.correct', { r, t: tot }))}</span>${sc < N3.SEC_CUTOFF ? `<span class="risk">${esc(t('res.below19'))}</span>` : `<span class="safe">${esc(t('res.above', { n: sc - N3.SEC_CUTOFF }))}</span>`}</div></div>`; }).join('')}
+<div class="secr tot"><div class="top"><span class="nm">${esc(t('res.total'))}</span><span class="sc">${j.total}<small> / 180</small></span></div>${meter(j.total, 180, N3.PASS_TOTAL, ' total')}
+  <div class="meta"><span>${esc(t('res.meta'))}</span>${j.pass ? `<span class="safe">${esc(t('res.passLevel'))}</span>` : `<span class="risk">${esc(t('res.belowPass'))}</span>`}</div></div>
 </div>
-<p class="note">In-app estimate. Each section's share of correct answers is scaled to 0–60; the real JLPT uses scaled scoring, so an official result can differ.</p>
-<div class="sec">${secHead('Answers')}<div class="rlist">${byPart}</div></div>
-<div class="btns"><button class="btn" data-act="startMock">New mock test</button><button class="btn primary" data-act="leaveResults" data-arg="#/mock">Done</button></div>`;
+<p class="note">${esc(t('mock.note'))}</p>
+<div class="sec">${secHead(esc(t('res.answers')))}<div class="rlist">${byPart}</div></div>
+<div class="btns"><button class="btn" data-act="startMock">${esc(t('res.new'))}</button><button class="btn primary" data-act="leaveResults" data-arg="#/mock">${esc(t('res.done'))}</button></div>`;
   }
 
   // ---------- Progress ----------
@@ -774,7 +858,7 @@ ${N3.SEC_KEYS.map(k => { const sc = j.scores[k]; const [r, t] = m.secs[k]; retur
     }).join('');
     const streak = N3.currentStreak();
     return `
-${hd('Progress', { right: gearBtn() })}
+${hd(esc(t('nav.progress')), { right: gearBtn() })}
 ${N3.sync.signedIn() || N3.sync.status() === 'expired' ? syncLine('under-hdr') : ''}
 <div class="sec">${secHead('Exam sections', '', `last ${N3.SEC_RECENT} answers each`)}
 ${lead}
@@ -799,37 +883,39 @@ ${mocks ? `<div class="sec">${secHead('Mock tests')}<div class="kvs">${mocks}</d
 
   // ---------- Settings ----------
   function viewSettings() {
-    const t = N3.today();
+    const td = N3.today();
     const cur = S().settings.examDate;
     const exams = N3.EXAM_DATES.map(d => {
-      const n = N3.daysBetween(t, d);
+      const n = N3.daysBetween(td, d);
       const past = n < 0;
       return `<button class="opt${cur === d ? ' on' : ''}" data-act="exam" data-arg="${d}"${past ? ' disabled' : ''}>
-        <span class="rad"></span><span class="t">${esc(N3.fmtLongDate(d))}<small>${past ? 'Already passed' : n === 0 ? 'Today' : `in ${plural(n, 'day')}`}</small></span></button>`;
+        <span class="rad"></span><span class="t">${esc(N3.fmtLongDate(d))}<small>${esc(past ? t('set.passed') : n === 0 ? t('set.today') : tn('set.in', n))}</small></span></button>`;
     }).join('');
+    const langs = N3.LANGS.map(([c, name]) => `<button class="opt${N3.lang() === c ? ' on' : ''}" data-act="lang" data-arg="${c}" lang="${c}"><span class="rad"></span><span class="t">${esc(name)}</span></button>`).join('');
     return `
-${hd('Settings', { back: true })}
-<div class="sec">${secHead('JLPT exam date')}<div class="opts">${exams}</div></div>
-<div class="sec">${secHead('New words per day')}
+${hd(esc(t('title.settings')), { back: true })}
+<div class="sec" id="lang">${secHead(esc(t('lang.label')), '', N3.lang() === 'en' ? '' : 'Language')}<div class="opts">${langs}</div></div>
+<div class="sec">${secHead(esc(t('set.exam')))}<div class="opts">${exams}</div></div>
+<div class="sec">${secHead(esc(t('set.daily')))}
   <div class="seg">${N3.DAILY_NEW_OPTIONS.map(n => `<button class="${S().settings.dailyNew === n ? 'on' : ''}" data-act="daily" data-arg="${n}">${n}</button>`).join('')}</div></div>
-<div class="sec">${secHead('New grammar patterns per day')}
+<div class="sec">${secHead(esc(t('set.dailyG')))}
   <div class="seg">${N3.DAILY_GRAMMAR_OPTIONS.map(n => `<button class="${S().settings.dailyGrammar === n ? 'on' : ''}" data-act="dailyG" data-arg="${n}">${n}</button>`).join('')}</div></div>
 ${accountSec()}
-<div class="sec">${secHead('Backup')}
-  <p class="note">Save your progress to a file, or restore it from one. Works without an account.</p>
-  <div class="btns"><button class="btn" data-act="exportProgress">Export</button><button class="btn" data-act="importProgress">Import</button></div>
+<div class="sec">${secHead(esc(t('set.backup')))}
+  <p class="note">${esc(t('set.backupNote'))}</p>
+  <div class="btns"><button class="btn" data-act="exportProgress">${esc(t('set.export'))}</button><button class="btn" data-act="importProgress">${esc(t('set.import'))}</button></div>
   <input type="file" id="import-file" accept="application/json,.json" hidden></div>
-<div class="sec">${secHead('Content')}
+<div class="sec">${secHead(esc(t('set.content')))}
 <div class="kvs">
-  <div class="kv"><span>Words</span><b>${N3.num(N3.WORDS.length)} · ${plural(N3.UNITS.length, 'unit')}</b></div>
-  <div class="kv"><span>Grammar patterns</span><b>${N3.GRAMMAR.length} · ${plural(N3.G_UNITS.length, 'unit')}</b></div>
-  <div class="kv"><span>Listening · reading</span><b>${N3.LISTENING.length} · ${N3.READING.length}</b></div>
-  <div class="kv"><span>Free</span><b class="t">${freeNow() ? 'Everything, until Dec 6' : `${unitRangeText()}, grammar units 1–${N3.FREE_G_UNITS}, ${N3.FREE_LISTENING} conversations, ${N3.FREE_READING} passages`}</b></div>
-  <div class="kv"><span>Premium</span><b class="t" data-go="#/paywall">${S().premium ? 'Active' : freeNow() ? `Starts after Dec 6<small class="kv-sub">${PRICE_MO} · ${PRICE_YR}</small>` : `See plans<small class="kv-sub">${PRICE_MO} · ${PRICE_YR}</small>`}</b></div>
-  <div class="kv"><span>Voice</span><b class="t" lang="ja">VOICEVOX:春日部つむぎ</b></div>
+  <div class="kv"><span>${esc(t('set.words'))}</span><b>${N3.num(N3.WORDS.length)} · ${esc(tn('set.units', N3.UNITS.length))}</b></div>
+  <div class="kv"><span>${esc(t('set.patterns'))}</span><b>${N3.GRAMMAR.length} · ${esc(tn('set.units', N3.G_UNITS.length))}</b></div>
+  <div class="kv"><span>${esc(t('set.lr'))}</span><b>${N3.LISTENING.length} · ${N3.READING.length}</b></div>
+  <div class="kv"><span>${esc(t('set.free'))}</span><b class="t">${freeNow() ? esc(t('set.freeAll')) : `${unitRangeText()}, grammar units 1–${N3.FREE_G_UNITS}, ${N3.FREE_LISTENING} conversations, ${N3.FREE_READING} passages`}</b></div>
+  <div class="kv"><span>${esc(t('set.premium'))}</span><b class="t" data-go="#/paywall">${S().premium ? esc(t('set.active')) : freeNow() ? `${esc(t('set.startsAfter'))}<small class="kv-sub">${PRICE_MO} · ${PRICE_YR}</small>` : `${esc(t('set.seePlans'))}<small class="kv-sub">${PRICE_MO} · ${PRICE_YR}</small>`}</b></div>
+  <div class="kv"><span>${esc(t('set.voice'))}</span><b class="t" lang="ja">VOICEVOX:春日部つむぎ</b></div>
 </div></div>
-<div class="sec"><button class="danger" data-act="reset">Reset all progress</button></div>
-<p class="fine">N3 Tango · v0.2 · works offline</p>`;
+<div class="sec"><button class="danger" data-act="reset">${esc(t('set.reset'))}</button></div>
+<p class="fine">${esc(t('set.fine'))}</p>`;
   }
 
   // ---------- Account (Settings) ----------
@@ -841,22 +927,22 @@ ${accountSec()}
   function accountSec() {
     const msg = acctUi.msg ? `<p class="acct-msg${acctUi.err ? ' err' : ''}" role="status">${esc(acctUi.msg)}</p>` : '';
     if (N3.sync.signedIn()) {
-      return `<div class="sec" id="account">${secHead('Account')}
-  <div class="kvs"><div class="kv"><span>Signed in as</span><b class="acct-email">${esc(N3.sync.email())}</b></div></div>
+      return `<div class="sec" id="account">${secHead(esc(t('acc.h')))}
+  <div class="kvs"><div class="kv"><span>${esc(t('acc.signed'))}</span><b class="acct-email">${esc(N3.sync.email())}</b></div></div>
   ${syncLine()}
   ${msg}
-  <div class="btns"><button class="btn" data-act="syncNow"${acctUi.busy ? ' disabled' : ''}>Sync now</button><button class="btn" data-act="logout">Log out</button></div>
-  ${acctUi.del ? delConfirm() : `<button class="danger acct-del" data-act="deleteAccount"${acctUi.busy ? ' disabled' : ''}>Delete account</button>`}
+  <div class="btns"><button class="btn" data-act="syncNow"${acctUi.busy ? ' disabled' : ''}>${esc(t('acc.sync'))}</button><button class="btn" data-act="logout">${esc(t('acc.logout'))}</button></div>
+  ${acctUi.del ? delConfirm() : `<button class="danger acct-del" data-act="deleteAccount"${acctUi.busy ? ' disabled' : ''}>${esc(t('acc.delete'))}</button>`}
 </div>`;
     }
     const expired = N3.sync.status() === 'expired';
-    return `<div class="sec" id="account">${secHead('Account')}
-  <p class="note">${expired ? 'Your session has expired. Log in again to keep syncing.' : 'Optional. Sign in to keep your progress in sync across devices; the app works without an account.'}</p>
+    return `<div class="sec" id="account">${secHead(esc(t('acc.h')))}
+  <p class="note">${esc(t(expired ? 'acc.expired' : 'acc.optional'))}</p>
   <form class="acct-form" id="acct-form" novalidate>
-    <label><span>Email</span><input type="email" name="email" id="acct-email" autocomplete="username" inputmode="email" autocapitalize="off" spellcheck="false" value="${esc(N3.sync.email())}" required></label>
-    <label><span>Password (8 characters or more)</span><input type="password" name="password" id="acct-pw" autocomplete="current-password" minlength="8" required></label>
+    <label><span>${esc(t('acc.email'))}</span><input type="email" name="email" id="acct-email" autocomplete="username" inputmode="email" autocapitalize="off" spellcheck="false" value="${esc(N3.sync.email())}" required></label>
+    <label><span>${esc(t('acc.pw'))}</span><input type="password" name="password" id="acct-pw" autocomplete="current-password" minlength="8" required></label>
     ${msg}
-    <div class="btns"><button type="button" class="btn" data-act="authSignup"${acctUi.busy ? ' disabled' : ''}>Create account</button><button type="submit" class="btn primary" data-act="authLogin"${acctUi.busy ? ' disabled' : ''}>Log in</button></div>
+    <div class="btns"><button type="button" class="btn" data-act="authSignup"${acctUi.busy ? ' disabled' : ''}>${esc(t('acc.create'))}</button><button type="submit" class="btn primary" data-act="authLogin"${acctUi.busy ? ' disabled' : ''}>${esc(t('acc.login'))}</button></div>
   </form>
   ${syncLine()}
 </div>`;
@@ -865,11 +951,11 @@ ${accountSec()}
   function delConfirm() {
     const err = acctUi.delErr ? `<p class="acct-msg err" role="alert">${esc(acctUi.delErr)}</p>` : '';
     return `<div class="del-confirm" id="del-confirm" role="region" aria-labelledby="del-h">
-    <div class="h" id="del-h">Delete your account?</div>
-    <p>This permanently deletes your account (${esc(N3.sync.email())}) and the progress stored on our server. The progress on this device will also be cleared. This can't be undone.</p>
-    ${S().premium ? '<p><b>Premium:</b> deleting the account does not cancel your subscription. To stop billing, email info@mimoria.jp before deleting.</p>' : ''}
+    <div class="h" id="del-h">${esc(t('del.h'))}</div>
+    <p>${esc(t('del.p', { email: N3.sync.email() }))}</p>
+    ${S().premium ? `<p>${t('del.prem')}</p>` : ''}
     ${err}
-    <div class="btns"><button class="btn" data-act="deleteCancel"${acctUi.busy ? ' disabled' : ''}>Cancel</button><button class="btn danger-btn" data-act="deleteConfirm"${acctUi.busy ? ' disabled' : ''}>${acctUi.busy ? 'Deleting…' : 'Delete account'}</button></div>
+    <div class="btns"><button class="btn" data-act="deleteCancel"${acctUi.busy ? ' disabled' : ''}>${esc(t('del.cancel'))}</button><button class="btn danger-btn" data-act="deleteConfirm"${acctUi.busy ? ' disabled' : ''}>${esc(acctUi.busy ? t('del.busy') : t('acc.delete'))}</button></div>
   </div>`;
   }
   async function doDelete() {
@@ -886,20 +972,20 @@ ${accountSec()}
     ap.account = false; apSave();
     ui.session = ui.quiz = ui.mock = ui.listen = ui.read = null;
     render();
-    toast('Account deleted');
+    toast(t('del.done'));
   }
   async function doAuth(kind) {
     if (acctUi.busy) return;
     const email = (document.getElementById('acct-email') || {}).value || '';
     const pw = (document.getElementById('acct-pw') || {}).value || '';
-    if (!email.trim() || !pw) { acctUi.msg = 'Enter your email and password.'; acctUi.err = true; return render(); }
-    if (kind === 'signup' && [...pw].length < 8) { acctUi.msg = 'Use at least 8 characters for your password.'; acctUi.err = true; return render(); }
-    acctUi.busy = true; acctUi.msg = kind === 'signup' ? 'Creating your account…' : 'Logging in…'; acctUi.err = false;
+    if (!email.trim() || !pw) { acctUi.msg = t('auth.need'); acctUi.err = true; return render(); }
+    if (kind === 'signup' && [...pw].length < 8) { acctUi.msg = t('err.weak_password'); acctUi.err = true; return render(); }
+    acctUi.busy = true; acctUi.msg = kind === 'signup' ? t('auth.creating') : t('auth.logging'); acctUi.err = false;
     render();
     try {
       if (kind === 'signup') await N3.sync.signup(email, pw); else await N3.sync.login(email, pw);
       acctUi.msg = ''; acctUi.err = false;
-      toast(kind === 'signup' ? 'Account created. Progress is synced.' : 'Logged in');
+      toast(kind === 'signup' ? t('auth.created') : t('auth.in'));
     } catch (e) {
       acctUi.msg = N3.sync.errorText(e); acctUi.err = true;
       acctUi.busy = false; render();
@@ -945,47 +1031,44 @@ ${accountSec()}
   }
 
   // ---------- Paywall ----------
+  const featList = offline => `<div class="feats">
+  <div>${I('check')}${esc(t('pw.f1', { w: N3.num(N3.WORDS.length), u: N3.UNITS.length }))}</div>
+  <div>${I('check')}${esc(t('pw.f2', { g: N3.GRAMMAR.length }))}</div>
+  <div>${I('check')}${esc(t('pw.f3', { l: N3.LISTENING.length, r: N3.READING.length }))}</div>
+  <div>${I('check')}${esc(t('pw.f4'))}</div>
+  ${offline ? `<div>${I('check')}${esc(t('pw.f5'))}</div>` : ''}
+</div>`;
   function viewPaywall(params) {
     const yr = ui.plan === 'year';
     if (freeNow() && !S().premium) return viewPaywallFree();
     let what = '';
-    if (params.get('unit')) what = `Vocabulary unit ${esc(params.get('unit'))} is part of Premium. `;
-    else if (params.get('gunit')) what = `Grammar unit ${esc(params.get('gunit'))} is part of Premium. `;
-    else if (params.get('listen')) what = `Conversations ${N3.FREE_LISTENING + 1}–${N3.LISTENING.length} are part of Premium. `;
-    else if (params.get('read')) what = `Passages ${N3.FREE_READING + 1}–${N3.READING.length} are part of Premium. `;
+    if (params.get('unit')) what = t('pw.unit', { u: params.get('unit') });
+    else if (params.get('gunit')) what = t('pw.gunit', { u: params.get('gunit') });
+    else if (params.get('listen')) what = t('pw.listen', { a: N3.FREE_LISTENING + 1, b: N3.LISTENING.length });
+    else if (params.get('read')) what = t('pw.read', { a: N3.FREE_READING + 1, b: N3.READING.length });
     return `
-<div class="runtop"><button class="icon-btn" data-act="back" aria-label="Close">${I('close')}</button></div>
-<div class="pw"><h1>Every N3 unit, all four sections</h1>
-  <p>${what}Free: ${unitRangeText()}, grammar units 1–${N3.FREE_G_UNITS}, ${N3.FREE_LISTENING} conversations and ${N3.FREE_READING} reading passages.</p></div>
-<div class="feats">
-  <div>${I('check')}${N3.num(N3.WORDS.length)} words in ${N3.UNITS.length} units, with example audio</div>
-  <div>${I('check')}${N3.GRAMMAR.length} grammar patterns with example audio</div>
-  <div>${I('check')}${N3.LISTENING.length} listening conversations, ${N3.READING.length} reading passages</div>
-  <div>${I('check')}Mock tests drawn from everything</div>
-  <div>${I('check')}Works offline</div>
-</div>
+<div class="runtop"><button class="icon-btn" data-act="back" aria-label="${esc(t('aria.close'))}">${I('close')}</button></div>
+<div class="pw"><h1>${esc(t('pw.h'))}</h1>
+  <p>${esc(what + t('pw.free', { units: unitRangeT(), g: N3.FREE_G_UNITS, l: N3.FREE_LISTENING, r: N3.FREE_READING }))}</p></div>
+${featList(true)}
 ${paywallPlans(yr)}`;
   }
 
   // Free period: the Premium screen stays reachable but sells nothing; registration is offered only as sync.
   function viewPaywallFree() {
     const acct = N3.sync.signedIn() ? ''
-      : `<button class="btn primary start" data-act="accountFirst" id="pw-account">Create a free account to save your progress</button>
-<p class="fine">Optional. An account keeps your progress safe and syncs it across devices.</p>`;
+      : `<button class="btn primary start" data-act="accountFirst" id="pw-account">${esc(t('pw.saveAcct'))}</button>
+<p class="fine">${esc(t('pw.saveFine'))}</p>`;
     return `
-<div class="runtop"><button class="icon-btn" data-act="back" aria-label="Close">${I('close')}</button></div>
-<div class="pw" id="pw-free"><h1>${esc(FREE_MSG)}</h1>
-  <p>Premium starts after Dec 6: $12.99/mo or $59.99/yr. Until then, everything is free.</p></div>
-<div class="feats">
-  <div>${I('check')}${N3.num(N3.WORDS.length)} words in ${N3.UNITS.length} units, with example audio</div>
-  <div>${I('check')}${N3.GRAMMAR.length} grammar patterns with example audio</div>
-  <div>${I('check')}${N3.LISTENING.length} listening conversations, ${N3.READING.length} reading passages</div>
-  <div>${I('check')}Mock tests drawn from everything</div>
-</div>
+<div class="runtop"><button class="icon-btn" data-act="back" aria-label="${esc(t('aria.close'))}">${I('close')}</button></div>
+<div class="pw" id="pw-free"><h1>${esc(t('free.msg'))}</h1>
+  <p>${esc(t('pw.freeSub'))}</p></div>
+${featList(false)}
 ${acct}`;
   }
 
-  const PLAN_NAME = { monthly: 'Monthly', yearly: 'Yearly' };
+  const PLAN_NAME = { monthly: 'pw.planM', yearly: 'pw.planY' };
+  const PLAN_SHORT = { monthly: 'pw.monthly', yearly: 'pw.yearly' };
   // Stripe Payment Link for a plan, tagged with the account id (client_reference_id) and email.
   function checkoutUrl(plan) {
     const base = (N3.PAY_LINKS && N3.PAY_LINKS[plan]) || '';
@@ -997,27 +1080,27 @@ ${acct}`;
   function paywallPlans(yr) {
     if (S().premium) {
       const p = N3.sync.plan();
-      return `<div class="pw-on" id="pw-active"><b>Premium is active</b>${p ? `<span>${PLAN_NAME[p]} plan</span>` : ''}</div>
-<p class="fine">Every unit, conversation and passage is open on this account. To manage or cancel your subscription, email info@mimoria.jp and we will take care of it.</p>`;
+      return `<div class="pw-on" id="pw-active"><b>${esc(t('pw.active'))}</b>${p && PLAN_NAME[p] ? `<span>${esc(t(PLAN_NAME[p]))}</span>` : ''}</div>
+<p class="fine">${esc(t('pw.activeFine'))}</p>`;
     }
     const cards = `<div class="plans">
-  <button class="plan-o${yr ? ' on' : ''}" data-act="plan" data-arg="year" data-plan="yearly"><span class="rad"></span><span class="t">Yearly <span class="save">SAVE 61%</span><small>$5.00 a month, billed yearly</small></span><span class="pr">$59.99<small>per year</small></span></button>
-  <button class="plan-o${yr ? '' : ' on'}" data-act="plan" data-arg="month" data-plan="monthly"><span class="rad"></span><span class="t">Monthly<small>Billed monthly</small></span><span class="pr">$12.99<small>per month</small></span></button>
+  <button class="plan-o${yr ? ' on' : ''}" data-act="plan" data-arg="year" data-plan="yearly"><span class="rad"></span><span class="t">${esc(t('pw.yearly'))} <span class="save">${esc(t('pw.save'))}</span><small>${esc(t('pw.yearlySub'))}</small></span><span class="pr">$59.99<small>${esc(t('pw.perYear'))}</small></span></button>
+  <button class="plan-o${yr ? '' : ' on'}" data-act="plan" data-arg="month" data-plan="monthly"><span class="rad"></span><span class="t">${esc(t('pw.monthly'))}<small>${esc(t('pw.monthlySub'))}</small></span><span class="pr">$12.99<small>${esc(t('pw.perMonth'))}</small></span></button>
 </div>`;
     const plan = yr ? 'yearly' : 'monthly';
     if (!N3.sync.signedIn()) {
       return `${cards}
-<button class="btn primary start" data-act="accountFirst" id="pw-account">Create a free account first</button>
-<p class="fine">Premium attaches to your account, so it works on every device you sign in on.</p>`;
+<button class="btn primary start" data-act="accountFirst" id="pw-account">${esc(t('pw.first'))}</button>
+<p class="fine">${esc(t('pw.firstFine'))}</p>`;
     }
     const url = checkoutUrl(plan);
     if (!url) {
       return `${cards}
-<p class="note pw-soon" id="pw-soon">Online checkout opens shortly.</p>`;
+<p class="note pw-soon" id="pw-soon">${esc(t('pw.soon'))}</p>`;
     }
     return `${cards}
-<a class="btn primary start" id="pw-buy" href="${esc(url)}" rel="noopener">Continue — ${PLAN_NAME[plan]}, ${yr ? '$59.99 a year' : '$12.99 a month'}</a>
-<p class="fine">Secure payment by Stripe. The subscription renews automatically until you cancel it.</p>`;
+<a class="btn primary start" id="pw-buy" href="${esc(url)}" rel="noopener">${esc(t('pw.continue', { plan: t(PLAN_SHORT[plan]), price: yr ? t('pw.priceY') : t('pw.priceM') }))}</a>
+<p class="fine">${esc(t('pw.stripe'))}</p>`;
   }
 
   // ---------- Router ----------
@@ -1053,7 +1136,10 @@ ${acct}`;
     $view.innerHTML = r.view(params);
     const nonav = typeof r.nonav === 'function' ? r.nonav() : !!r.nonav;
     $app.classList.toggle('nonav', nonav);
-    for (const el of $nav.children) el.classList.toggle('on', el.dataset.tab === r.tab);
+    for (const el of $nav.children) {
+      el.classList.toggle('on', el.dataset.tab === r.tab);
+      const l = el.querySelector('.l'); if (l) l.textContent = t('nav.' + el.dataset.tab);
+    }
     if (key !== lastRoute) { window.scrollTo(0, 0); lastRoute = key; }
     // red sheet on the study card
     sheetCtl = null;
@@ -1219,19 +1305,19 @@ ${acct}`;
       render();
       window.scrollTo(0, 0);
     },
-    exitMock() { if (confirm('Leave the mock test? Your answers will not be saved.')) { stopAudio(); ui.mock = null; render(); } },
+    exitMock() { if (confirm(t('mock.exit'))) { stopAudio(); ui.mock = null; render(); } },
     leaveResults(arg) {
       if (arg === '#/quiz') ui.quiz = null;
       if (arg === '#/mock') ui.mock = null;
-      go(arg === '#/mock' ? '#/practice' : arg);
+      go(arg === '#/mock' ? '#/home' : arg);   // Home shows the weakest section after a mock
     },
 
-    exam(arg) { S().settings.examDate = arg; N3.save(); render(); toast('Exam date updated'); },
+    exam(arg) { S().settings.examDate = arg; N3.save(); render(); toast(t('set.examDone')); },
     daily(arg) { S().settings.dailyNew = Number(arg); N3.save(); render(); },
     dailyG(arg) { S().settings.dailyGrammar = Number(arg); N3.save(); render(); },
     reset() {
-      if (confirm(`Reset all progress? This deletes your reviews, streak and scores on this device${N3.sync.signedIn() ? ' and in your account' : ''}.`)) {
-        N3.resetAll(); ui.session = ui.quiz = ui.mock = ui.listen = ui.read = null; render(); toast('Progress reset');
+      if (confirm(t(N3.sync.signedIn() ? 'set.resetQAcct' : 'set.resetQ'))) {
+        N3.resetAll(); ui.session = ui.quiz = ui.mock = ui.listen = ui.read = null; render(); toast(t('set.resetDone'));
       }
     },
     back() { if (lastNav) history.back(); else go('#/home'); },
@@ -1243,8 +1329,8 @@ ${acct}`;
     deleteConfirm() { doDelete(); },
     logout() {
       acctUi.del = false;
-      if (!confirm('Log out? Your progress stays on this device; it will no longer sync.')) return;
-      N3.sync.logout(); acctUi.msg = ''; render(); toast('Logged out');
+      if (!confirm(t('auth.logoutQ'))) return;
+      N3.sync.logout(); acctUi.msg = ''; render(); toast(t('auth.out'));
     },
     async syncNow() {
       acctUi.busy = true; render();
@@ -1257,6 +1343,16 @@ ${acct}`;
     plan(arg) { ui.plan = arg; render(); },
     apLater() { ui.apRun = null; render(); },
     apCreate() { ui.apRun = null; ACTIONS.accountFirst(); },
+    // Home: one tap from the weakest mock-test section into matching practice.
+    fixSec(arg) {
+      ui.planRun = false;
+      if (arg === 'rd') { const p = N3.nextReading(); if (p) openPassage(p, false); else go('#/reading'); return; }
+      if (arg === 'ls') { if (!startListen(N3.nextListening(5), false)) go('#/listening'); return; }
+      ui.quizMode = 'mixed'; ui.quiz = null; ACTIONS.startQuiz();
+    },
+    async install() { const ok = await N3.install.prompt(); render(); if (ok) toast(t('inst.done')); },
+    installDismiss() { N3.install.dismiss(); render(); },
+    lang(arg) { if (N3.setLang(arg)) render(); },
     accountFirst() {
       // Scroll + focus happen in render() once Settings is on screen: the hashchange re-render would
       // otherwise replace the form and drop the focus.
@@ -1284,7 +1380,12 @@ ${acct}`;
   });
 
   document.addEventListener('submit', e => { if (e.target && e.target.id === 'acct-form') e.preventDefault(); });
-  document.addEventListener('change', e => { if (e.target && e.target.id === 'import-file') importFile(e.target.files && e.target.files[0]); });
+  document.addEventListener('change', e => {
+    if (e.target && e.target.id === 'import-file') importFile(e.target.files && e.target.files[0]);
+    if (e.target && e.target.matches && e.target.matches('select[data-lang]')) ACTIONS.lang(e.target.value);
+  });
+  // Install prompt became available (or the app was installed): refresh the Home card.
+  N3.onInstallChange = () => { if (parse().name === 'home') render(); };
 
   // Sync status changes: update the small status lines in place (no full re-render, so forms keep their input).
   N3.onSyncStatus = st => {
@@ -1305,15 +1406,15 @@ ${acct}`;
     const q = params.toString();
     history.replaceState(null, '', location.pathname + location.search + '#/' + name + (q ? '?' + q : ''));
     lastRoute = null; render();
-    if (!N3.sync.signedIn()) { toast('Payment received — log in to the account you paid with to activate Premium.'); return; }
+    if (!N3.sync.signedIn()) { toast(t('ck.login')); return; }
     await N3.sync.syncNow();
-    if (S().premium) { render(); toast('Welcome to Premium'); return; }
-    toast('Payment received — Premium activates within a minute.');
+    if (S().premium) { render(); toast(t('ck.welcome')); return; }
+    toast(t('ck.soon'));
     // The webhook may land a moment after the redirect: check a couple more times quietly.
     for (const ms of [8000, 20000]) {
       await new Promise(r => setTimeout(r, ms));
       await N3.sync.syncNow();
-      if (S().premium) { render(); toast('Welcome to Premium'); return; }
+      if (S().premium) { render(); toast(t('ck.welcome')); return; }
     }
   }
 

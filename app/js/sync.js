@@ -216,9 +216,9 @@
   function errorText(e) {
     if (e && e.code === 'too_many_attempts') {
       const m = Math.max(1, Math.ceil((e.body.retryAfter || 60) / 60));
-      return `Too many attempts. Try again in ${m} min.`;
+      return N3.t('err.too_many', { m });
     }
-    return (e && ERR_TEXT[e.code]) || 'Something went wrong. Please try again.';
+    return e && ERR_TEXT[e.code] ? N3.t('err.' + e.code) : N3.t('err.generic');
   }
 
   N3.sync = {
@@ -228,7 +228,7 @@
     userId,
     plan: () => (acct && acct.plan) || null,
     status: () => (signedIn() ? status : acct && acct.email ? 'expired' : 'off'),
-    statusText: s => STATUS_TEXT[s || N3.sync.status()] || '',
+    statusText: s => { const k = s || N3.sync.status(); return STATUS_TEXT[k] ? N3.t('st.' + (k === 'pending' ? 'syncing' : k)) : ''; },
     errorText,
     signup: (email, password) => { const ref = storedRef(); return authenticate('/auth/signup', email, password, ref ? { ref } : undefined); },
     login: (email, password) => authenticate('/auth/login', email, password),
