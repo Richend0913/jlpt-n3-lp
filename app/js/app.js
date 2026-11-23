@@ -278,8 +278,8 @@ ${w ? `<div class="entry">
 </div>`;
   }
 
-  // Shown outside the paywall (Settings row, locked dividers); the plan cards carry the full prices.
-  const PRICE_MO = '$12.99/mo', PRICE_YR = '$59.99/yr';
+  // Shown outside the paywall (locked dividers); the plan card carries the full price.
+  const PRICE_ONCE = () => t('prem.price');
   // Free period (N3.FREE_UNTIL in store.js): one message replaces every upgrade prompt until it ends.
   const freeNow = () => N3.isFreePeriod();
   const freeBanner = () => (freeNow() ? `<p class="free-bar" id="free-banner">${esc(t('free.msg'))}</p>` : '');
@@ -294,7 +294,7 @@ ${w ? `<div class="entry">
       if (!open && !lockedShown) {
         lockedShown = true;
         const last = N3.UNITS[N3.UNITS.length - 1];
-        out.push(`</div><button class="prem" data-go="#/paywall?unit=${u}">Units ${range(u, last)} · Premium · ${PRICE_MO}</button><div class="toc" style="margin-top:0">`);
+        out.push(`</div><button class="prem" data-go="#/paywall?unit=${u}">Units ${range(u, last)} · Premium · ${esc(PRICE_ONCE())}</button><div class="toc" style="margin-top:0">`);
       }
       const seen = ws.filter(w => N3.isSeen(w.id)).length;
       const done = open && seen === ws.length && ws.length > 0;
@@ -312,7 +312,7 @@ ${w ? `<div class="entry">
       const open = N3.isGUnitOpen(u);
       if (!open && !lockedShown) {
         lockedShown = true;
-        out.push(`</div><button class="prem" data-go="#/paywall?gunit=${u}">Units ${range(u, N3.G_UNITS[N3.G_UNITS.length - 1])} · Premium · ${PRICE_MO}</button><div class="toc" style="margin-top:0">`);
+        out.push(`</div><button class="prem" data-go="#/paywall?gunit=${u}">Units ${range(u, N3.G_UNITS[N3.G_UNITS.length - 1])} · Premium · ${esc(PRICE_ONCE())}</button><div class="toc" style="margin-top:0">`);
       }
       const seen = gs.filter(g => N3.isSeen(g.id)).length;
       const done = open && seen === gs.length;
@@ -659,7 +659,7 @@ ${planNext(`<div class="btns"><button class="btn" data-act="${againAct}">Try aga
       let locked = false;
       for (const x of N3.LISTENING) {
         const o = N3.isListenOpen(x);
-        if (!o && !locked) { locked = true; rows.push(`</div><button class="prem" data-go="#/paywall?listen=1">Conversations ${range(x.no, N3.LISTENING.length)} · Premium · ${PRICE_MO}</button><div class="toc" style="margin-top:0">`); }
+        if (!o && !locked) { locked = true; rows.push(`</div><button class="prem" data-go="#/paywall?listen=1">Conversations ${range(x.no, N3.LISTENING.length)} · Premium · ${esc(PRICE_ONCE())}</button><div class="toc" style="margin-top:0">`); }
         const e = st[x.id];
         rows.push(`<button class="tr${o ? '' : ' dim'}" data-act="listenOne" data-arg="${x.id}"><span class="n">${two(x.no)}</span><span class="nm">${x.type === 'response' ? 'Best reply' : 'Comprehension'}</span>${e && e.ok ? '<span class="stamp sm" lang="ja" aria-label="Answered correctly">済</span>' : ''}<span class="dots"></span><span class="rg">${e ? (e.ok ? 'correct' : 'missed') : x.script.length + ' lines'}</span></button>`);
       }
@@ -710,7 +710,7 @@ ${answered ? `${feedbackHtml(q)}<div class="btns"><button class="btn primary" da
     let locked = false;
     for (const p of N3.READING) {
       const o = N3.isReadOpen(p);
-      if (!o && !locked) { locked = true; rows.push(`</div><button class="prem" data-go="#/paywall?read=1">Passages ${range(p.no, N3.READING.length)} · Premium · ${PRICE_MO}</button><div class="toc" style="margin-top:0">`); }
+      if (!o && !locked) { locked = true; rows.push(`</div><button class="prem" data-go="#/paywall?read=1">Passages ${range(p.no, N3.READING.length)} · Premium · ${esc(PRICE_ONCE())}</button><div class="toc" style="margin-top:0">`); }
       const e = st[p.id];
       rows.push(`<button class="tr${o ? '' : ' dim'}" data-act="readOne" data-arg="${p.id}"><span class="n">${two(p.no)}</span><span class="nm">${esc(p.title || 'Passage')}</span>${e ? '<span class="stamp sm" lang="ja" aria-label="Read">済</span>' : ''}<span class="dots"></span><span class="rg">${e ? `${e.r}/${e.t}` : `${p.chars}字`}</span></button>`);
     }
@@ -911,7 +911,7 @@ ${accountSec()}
   <div class="kv"><span>${esc(t('set.patterns'))}</span><b>${N3.GRAMMAR.length} · ${esc(tn('set.units', N3.G_UNITS.length))}</b></div>
   <div class="kv"><span>${esc(t('set.lr'))}</span><b>${N3.LISTENING.length} · ${N3.READING.length}</b></div>
   <div class="kv"><span>${esc(t('set.free'))}</span><b class="t">${freeNow() ? esc(t('set.freeAll')) : `${unitRangeText()}, grammar units 1–${N3.FREE_G_UNITS}, ${N3.FREE_LISTENING} conversations, ${N3.FREE_READING} passages`}</b></div>
-  <div class="kv"><span>${esc(t('set.premium'))}</span><b class="t" data-go="#/paywall">${S().premium ? esc(t('set.active')) : freeNow() ? `${esc(t('set.startsAfter'))}<small class="kv-sub">${PRICE_MO} · ${PRICE_YR}</small>` : `${esc(t('set.seePlans'))}<small class="kv-sub">${PRICE_MO} · ${PRICE_YR}</small>`}</b></div>
+  <div class="kv"><span>${esc(t('set.premium'))}</span><b class="t" data-go="#/paywall">${S().premium ? esc(t('set.active')) : freeNow() ? `${esc(t('set.startsAfter'))}<small class="kv-sub">${esc(t('set.price'))}</small>` : `${esc(t('set.seePlans'))}<small class="kv-sub">${esc(t('set.price'))}</small>`}</b></div>
   <div class="kv"><span>${esc(t('set.voice'))}</span><b class="t" lang="ja">VOICEVOX:春日部つむぎ</b></div>
 </div></div>
 <div class="sec"><button class="danger" data-act="reset">${esc(t('set.reset'))}</button></div>
@@ -1039,7 +1039,6 @@ ${accountSec()}
   ${offline ? `<div>${I('check')}${esc(t('pw.f5'))}</div>` : ''}
 </div>`;
   function viewPaywall(params) {
-    const yr = ui.plan === 'year';
     if (freeNow() && !S().premium) return viewPaywallFree();
     let what = '';
     if (params.get('unit')) what = t('pw.unit', { u: params.get('unit') });
@@ -1049,9 +1048,10 @@ ${accountSec()}
     return `
 <div class="runtop"><button class="icon-btn" data-act="back" aria-label="${esc(t('aria.close'))}">${I('close')}</button></div>
 <div class="pw"><h1>${esc(t('pw.h'))}</h1>
+  <p id="pw-once">${esc(t('pw.oneTime'))}</p>
   <p>${esc(what + t('pw.free', { units: unitRangeT(), g: N3.FREE_G_UNITS, l: N3.FREE_LISTENING, r: N3.FREE_READING }))}</p></div>
 ${featList(true)}
-${paywallPlans(yr)}`;
+${paywallPlans()}`;
   }
 
   // Free period: the Premium screen stays reachable but sells nothing; registration is offered only as sync.
@@ -1067,39 +1067,36 @@ ${featList(false)}
 ${acct}`;
   }
 
-  const PLAN_NAME = { monthly: 'pw.planM', yearly: 'pw.planY' };
-  const PLAN_SHORT = { monthly: 'pw.monthly', yearly: 'pw.yearly' };
-  // Stripe Payment Link for a plan, tagged with the account id (client_reference_id) and email.
-  function checkoutUrl(plan) {
-    const base = (N3.PAY_LINKS && N3.PAY_LINKS[plan]) || '';
+  const PLAN_NAME = { lifetime: 'pw.planL', monthly: 'pw.planM', yearly: 'pw.planY' };
+  // Stripe Payment Link for the Lifetime purchase, tagged with the account id (client_reference_id) and email.
+  function checkoutUrl() {
+    const base = N3.LIFETIME_LINK || '';
     const uid = N3.sync.userId();
     if (!base || !uid) return '';
     return base + (base.includes('?') ? '&' : '?') + 'client_reference_id=' + encodeURIComponent(uid) +
       '&prefilled_email=' + encodeURIComponent(N3.sync.email());
   }
-  function paywallPlans(yr) {
+  function paywallPlans() {
     if (S().premium) {
       const p = N3.sync.plan();
       return `<div class="pw-on" id="pw-active"><b>${esc(t('pw.active'))}</b>${p && PLAN_NAME[p] ? `<span>${esc(t(PLAN_NAME[p]))}</span>` : ''}</div>
 <p class="fine">${esc(t('pw.activeFine'))}</p>`;
     }
     const cards = `<div class="plans">
-  <button class="plan-o${yr ? ' on' : ''}" data-act="plan" data-arg="year" data-plan="yearly"><span class="rad"></span><span class="t">${esc(t('pw.yearly'))} <span class="save">${esc(t('pw.save'))}</span><small>${esc(t('pw.yearlySub'))}</small></span><span class="pr">$59.99<small>${esc(t('pw.perYear'))}</small></span></button>
-  <button class="plan-o${yr ? '' : ' on'}" data-act="plan" data-arg="month" data-plan="monthly"><span class="rad"></span><span class="t">${esc(t('pw.monthly'))}<small>${esc(t('pw.monthlySub'))}</small></span><span class="pr">$12.99<small>${esc(t('pw.perMonth'))}</small></span></button>
+  <div class="plan-o on" id="pw-lifetime" data-plan="lifetime"><span class="rad"></span><span class="t">${esc(t('pw.lifetime'))}<small>${esc(t('pw.lifetimeSub'))}</small></span><span class="pr">$29.99<small>${esc(t('pw.oneTimeLbl'))}</small></span></div>
 </div>`;
-    const plan = yr ? 'yearly' : 'monthly';
     if (!N3.sync.signedIn()) {
       return `${cards}
 <button class="btn primary start" data-act="accountFirst" id="pw-account">${esc(t('pw.first'))}</button>
 <p class="fine">${esc(t('pw.firstFine'))}</p>`;
     }
-    const url = checkoutUrl(plan);
+    const url = checkoutUrl();
     if (!url) {
       return `${cards}
 <p class="note pw-soon" id="pw-soon">${esc(t('pw.soon'))}</p>`;
     }
     return `${cards}
-<a class="btn primary start" id="pw-buy" href="${esc(url)}" rel="noopener">${esc(t('pw.continue', { plan: t(PLAN_SHORT[plan]), price: yr ? t('pw.priceY') : t('pw.priceM') }))}</a>
+<a class="btn primary start" id="pw-buy" href="${esc(url)}" rel="noopener">${esc(t('pw.continue', { plan: t('pw.lifetime'), price: t('pw.priceL') }))}</a>
 <p class="fine">${esc(t('pw.stripe'))}</p>`;
   }
 

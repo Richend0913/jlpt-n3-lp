@@ -12,10 +12,10 @@
   // API base: dev override in localStorage ('n3tango.api'), local worker when served from 127.0.0.1 /
   // localhost (wrangler dev), otherwise the production Worker.
   const PROD_API = 'https://jlpt-account.burningbros.workers.dev';
-  // Stripe Payment Links (filled in once Stripe is connected; empty = checkout not open yet).
-  // Each link carries metadata plan=monthly|yearly; success URL .../app/#/settings?checkout=success
-  const PAY_LINKS = { monthly: 'https://buy.stripe.com/4gM7sKdGDeLQdow0b99Zm01', yearly: 'https://buy.stripe.com/6oU3cu6ebavAgAI8HF9Zm00' };
-  N3.PAY_LINKS = PAY_LINKS;
+  // Stripe Payment Link for the one-time Lifetime purchase ($29.99, payment mode; the webhook grants plan=lifetime).
+  // Success URL .../app/#/settings?checkout=success. Placeholder until the live link exists = checkout not open yet.
+  const LIFETIME_LINK = 'https://buy.stripe.com/dRm5kCcCz5bg84c3nl9Zm02';
+  N3.LIFETIME_LINK = /^https:\/\//.test(LIFETIME_LINK) ? LIFETIME_LINK : '';
   function apiBase() {
     let o = null;
     try { o = localStorage.getItem('n3tango.api'); } catch (e) {}
@@ -113,7 +113,7 @@
   // The server owns Premium: apply its entitlement to the local mirror.
   function applyEntitlement(ent) {
     if (!ent || typeof ent !== 'object') return;
-    const plan = ent.active && (ent.plan === 'monthly' || ent.plan === 'yearly') ? ent.plan : null;
+    const plan = ent.active && (ent.plan === 'lifetime' || ent.plan === 'monthly' || ent.plan === 'yearly') ? ent.plan : null;
     if (acct && acct.plan !== plan) { acct.plan = plan; writeJson(ACCT_KEY, acct); }
     if (N3.setPremium(!!ent.active) && typeof N3.onEntitlement === 'function') { try { N3.onEntitlement(!!ent.active); } catch (e) {} }
   }
