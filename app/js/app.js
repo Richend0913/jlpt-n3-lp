@@ -482,11 +482,36 @@ ${card}
 ${actions}`;
   }
 
+  // ---------- unit-completion beacon ----------
+  // A unit counts as completed when its last unseen item is graded for the first time (the same "all items
+  // seen" rule as the unit list's done state). One hit p=unit per unit per device (localStorage guard), only on
+  // n3.mimoria.jp, never with the n3_no_track opt-out. Units already complete (earlier, or via cloud sync) never fire.
+  const UNIT_HIT_KEY = 'n3tango.unitHit.v1';
+  function unitDoneNow(track, u) {
+    const pool = track === 'grammar' ? N3.gUnitItems(u) : N3.unitWords(u);
+    return pool.length > 0 && pool.every(x => N3.isSeen(x.id));
+  }
+  function unitHit(track, u) {
+    try {
+      if (localStorage.getItem('n3_no_track') === '1' || location.hostname !== 'n3.mimoria.jp') return;
+      const sent = JSON.parse(localStorage.getItem(UNIT_HIT_KEY) || '{}') || {};
+      const k = (track === 'grammar' ? 'g' : 'v') + u;
+      if (sent[k]) return;
+      sent[k] = 1; localStorage.setItem(UNIT_HIT_KEY, JSON.stringify(sent));
+      const b = new URLSearchParams({ p: 'unit', r: localStorage.getItem('n3_ref') || '' });
+      const url = 'https://jlpt-account.burningbros.workers.dev/hit';
+      if (!(navigator.sendBeacon && navigator.sendBeacon(url, b))) fetch(url, { method: 'POST', body: b, keepalive: true, mode: 'no-cors' }).catch(() => {});
+    } catch (e) {}
+  }
+
   function gradeCard(know) {
     stopAudio();
     const s = ui.session;
     const item = s.queue[s.idx];
+    const it = s.track === 'grammar' ? N3.G_BY_ID[item.id] : N3.BY_ID[item.id];
+    const firstSeen = it && !N3.isSeen(item.id);
     if (!item.again) { N3.srsGrade(item.id, know); if (know) s.firstKnow++; }
+    if (firstSeen && N3.isSeen(item.id) && unitDoneNow(s.track, it.unit)) unitHit(s.track, it.unit);
     else N3.srsRelearn(item.id, know);
     const tries = s.requeues[item.id] || 0;
     if (!know && tries < 2) {
