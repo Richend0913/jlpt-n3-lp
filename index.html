@@ -73,6 +73,15 @@
   footer nav { margin-bottom:10px; }
   footer nav a { color:#9fb2cc; margin-right:14px; font-size:13px; }
   @media (max-width:680px){ h1{font-size:28px} .facts{grid-template-columns:1fr} .plansx{grid-template-columns:1fr} }
+  .dl { margin-top:16px; display:flex; flex-direction:column; gap:10px; }
+  .dl .d { background:#101f3a; border:1px solid #22365c; border-radius:12px; padding:16px 18px; display:grid; grid-template-columns:1fr auto; gap:6px 18px; align-items:center; }
+  .dl .hd { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:2px 14px; }
+  .dl .nm { font-weight:900; font-size:16.5px; }
+  .dl .pr { font-weight:900; font-size:17px; color:#ffb066; white-space:nowrap; }
+  .dl .ds { grid-column:1; font-size:14.5px; color:#c7d3e6; }
+  .dl .trybtn { grid-column:2; grid-row:1 / span 2; font-size:15px; padding:10px 20px; white-space:nowrap; }
+  .dlnote { margin-top:16px; font-size:14.5px; }
+  @media (max-width:680px){ .dl .d{grid-template-columns:1fr} .dl .trybtn{grid-column:1; grid-row:auto; justify-self:start; margin-top:6px} }
 </style>
 </head>
 <body>
@@ -157,6 +166,29 @@
       </div>
       <p style="margin-top:12px;font-size:13.5px;color:#9fb2cc">Already have a free account? Sign in to the app on this device before buying and Premium unlocks automatically. Bought without an account? Create one in the app with the email you paid with and Premium unlocks automatically. Questions: <a href="mailto:info@mimoria.jp" style="color:#c7d3e6">info@mimoria.jp</a>.</p>
     </div>
+  </section>
+
+  <section id="downloads">
+    <h2>Prefer files? <span class="accent">Get the downloads</span></h2>
+    <p>The same N3 study content as the app, sold as files you download once and keep — no account, no app, nothing to install unless noted. Sold on BASE, a Japanese marketplace; checkout is in yen.</p>
+    <div class="dl">
+      <div class="d">
+        <div class="hd"><span class="nm">JLPT N3 Vocabulary Book (PDF)</span><span class="pr">¥1,480</span></div>
+        <p class="ds">All 1,000 N3 words with kanji, readings, English meanings and an example sentence each. 154 pages, made for printing or tablet reading.</p>
+        <a class="trybtn ghost" href="https://richend.base.shop/items/167287883" target="_blank" rel="noopener">Buy on BASE</a>
+      </div>
+      <div class="d">
+        <div class="hd"><span class="nm">JLPT N3 Mock Test Set</span><span class="pr">¥980</span></div>
+        <p class="ds">One full mock test in the real exam format: 32 questions across vocabulary, grammar &amp; reading and listening, with listening MP3s, full answer explanations, an answer sheet and a score sheet.</p>
+        <a class="trybtn ghost" href="https://richend.base.shop/items/167287910" target="_blank" rel="noopener">Buy on BASE</a>
+      </div>
+      <div class="d">
+        <div class="hd"><span class="nm">JLPT N3 Anki Deck</span><span class="pr">¥1,980</span></div>
+        <p class="ds">All 1,000 words as Anki flashcards with 2,000 audio clips (word + example sentence; VOICEVOX text-to-speech voice) for spaced repetition in the free Anki app.</p>
+        <a class="trybtn ghost" href="https://richend.base.shop/items/167287942" target="_blank" rel="noopener">Buy on BASE</a>
+      </div>
+    </div>
+    <p class="dlnote">Want the full course — all units, grammar, reading, listening, progress sync and offline study? That is the app: <a href="#pricing" style="color:#ffb066">Premium, $29.99 one-time</a>.</p>
   </section>
 
   <section id="start-free">
